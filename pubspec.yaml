@@ -1,0 +1,54 @@
+name: flutter_calendar
+description: "A new Flutter calendar project."
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.12.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  cupertino_icons: ^1.0.8
+  intl: ^0.20.2
+
+  # 📡 蓝牙与硬件连接
+  flutter_blue_plus: ^1.34.0
+  permission_handler: ^11.3.1
+  uuid: ^4.3.3
+  mqtt_client: ^10.5.0
+
+  flutter_colorpicker: ^1.1.0 # 🚀 引入取色器神库
+
+  fl_chart: ^0.70.0 # 🚀 2026年稳定版图表库
+
+  # 🌊 Riverpod 核心状态管理
+  flutter_riverpod: ^2.5.1
+  riverpod_annotation: ^2.6.1
+
+  # 🎯 官方国际化语言包支持
+  flutter_localizations:
+    sdk: flutter
+
+  # 📦 Isar 本地数据库工具链
+  isar: ^3.1.0+1
+  isar_flutter_libs: ^3.1.0+1
+  path_provider: ^2.1.5
+  implicitly_animated_reorderable_list_2: ^0.6.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  # 🛠️ 核心自动代码生成器
+  build_runner: ^2.4.9
+  riverpod_generator: ^2.4.0
+  isar_generator: ^3.1.0+1
+
+  # 🚨 代码规范与静态检查
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
