@@ -32,7 +32,7 @@
 
 1. **克隆仓库**
    ```bash
-   git clone https://github.com/your-username/flutter_calendar.git
+   git clone https://gitee.com/lurely/calendar-flutter.git
    cd flutter_calendar
    ```
 
