@@ -1,0 +1,49 @@
+{
+  "@@locale": "en",
+  "myPageTitle": "Me",
+  "clearCache": "Clear Cache",
+  "themeModeSelect": "Theme Mode",
+  "currentVersion": "Version",
+  "homePage": "Home",
+  "shift": "Shift",
+  "statistic": "Statistics",
+  "my": "Me",
+  "yearMonthDate": "{date}",
+  "@yearMonthDate": {
+    "placeholders": {
+      "date": {
+        "type": "DateTime",
+        "format": "yMMMM"
+      }
+    }
+  },
+  "monthDayDate": "{date}",
+  "@monthDayDate": {
+    "placeholders": {
+      "date": {
+        "type": "DateTime",
+        "format": "MMMMd"
+      }
+    }
+  },
+  "mon" : "Mon",
+  "tue" : "Tue",
+  "wed" : "Wed",
+  "thu" : "Thu",
+  "fri" : "Fri",
+  "sat" : "Sat",
+  "sun" : "Sun",
+  "detail": "Details",
+  "noShift": "No shift scheduled",
+  "endWork": "End of shift",
+  "startShift": "Start of shift",
+  "noShiftHint": "No shift scheduled for today. Enjoy a good sleep~",
+  "editShift": "Edit Shift",
+  "selectShiftType": "Select Shift Type",
+  "clearShift": "Clear/Rest",
+  "confirm": "Confirm",
+  "loadErr": "Failed to load configuration:",
+  "weight": "Weight",
+  "noData": "No data available",
+  "noWeightHint": "You haven't weighed yourself today. Click to record it~"
+}

@@ -25,7 +25,7 @@ final shiftConfigRepositoryProvider =
 typedef ShiftConfigRepositoryRef
     = AutoDisposeProviderRef<ShiftConfigRepository>;
 String _$shiftConfigViewModelHash() =>
-    r'33c7aef09f4c4d54d4c5b5c5ac59c58ab6e10281';
+    r'5465305e71e8a18ced63f16d92ba0fa404142a5e';
 
 /// See also [ShiftConfigViewModel].
 @ProviderFor(ShiftConfigViewModel)

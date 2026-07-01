@@ -16,28 +16,41 @@ class ShiftPatternPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final patternListSync = ref.watch(shiftPatternViewModelProvider);
+    // 🚀 【换装天眼】：提前抓取黑夜状态
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      // 现代感的高级淡灰背景
-      backgroundColor: const Color(0xFFF6F8FA),
+      // 🚀 【优化 1】：大背景全自动换装（白天现代淡灰，黑夜自动收缩为夜间大底色）
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        title: const Text(
+        title: Text(
           "周期模式管理",
-          style: TextStyle(fontWeight: FontWeight.bold,
-              fontSize: 16,
-              color: Color(0xFF1F1F1F)),
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 16,
+            // 🚀 【优化 2】：消灭死色，标题跟随系统主题
+            color: Theme.of(context).textTheme.bodyLarge?.color,
+          ),
         ),
-        leading: IconButton(onPressed: () => Navigator.maybePop(context),
-            icon: const Icon(Icons.arrow_back_ios_new, size: 20,)),
+        leading: IconButton(
+          onPressed: () => Navigator.maybePop(context),
+          icon: Icon(
+            Icons.arrow_back_ios_new,
+            size: 20,
+            color: isDark ? Colors.white70 : const Color(0xFF1F1F1F),
+          ),
+        ),
         centerTitle: true,
-        // 居中导航栏更具高级感
-        backgroundColor: Colors.white,
+        backgroundColor: Theme.of(context).cardColor, // 🚀 【优化 3】：导航栏底色完美感应
         elevation: 0,
         scrolledUnderElevation: 0,
-        // 给 AppBar 底部加一条极淡的分割线，层次感拉满
+        // 🚀 【优化 4】：AppBar 底部层次分割线自适应降噪
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(0.5),
-          child: Container(color: const Color(0xFFE5E5E5), height: 0.5),
+          child: Container(
+            color: isDark ? Colors.white.withValues(alpha: 0.06) : const Color(0xFFE5E5E5),
+            height: 0.5,
+          ),
         ),
       ),
       body: patternListSync.when(
@@ -47,12 +60,19 @@ class ShiftPatternPage extends ConsumerWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.calendar_month_outlined, size: 48,
-                      color: Colors.grey.withValues(alpha: 0.5)),
+                  Icon(
+                    Icons.calendar_month_outlined,
+                    size: 48,
+                    color: isDark ? Colors.white24 : Colors.grey.withValues(alpha: 0.5),
+                  ),
                   const SizedBox(height: 12),
-                  const Text(
+                  Text(
                     "暂无模式配置，点击下方按钮添加",
-                    style: TextStyle(color: Color(0xFF999999), fontSize: 14),
+                    // 🚀 【优化 5】：空状态提示文字颜色深度柔和化
+                    style: TextStyle(
+                      color: isDark ? Colors.white38 : const Color(0xFF999999),
+                      fontSize: 14,
+                    ),
                   ),
                 ],
               ),
@@ -60,7 +80,6 @@ class ShiftPatternPage extends ConsumerWidget {
           }
           return ImplicitlyAnimatedList<ShiftPattern>(
             items: dbList,
-            // 🎯 上下留白，底部强行留出 96 像素，完美避开 FloatingActionButton 遮挡！
             padding: const EdgeInsets.only(top: 14, bottom: 96),
             physics: const BouncingScrollPhysics(),
             areItemsTheSame: (oldItem, newItem) => oldItem.id == newItem.id,
@@ -69,8 +88,7 @@ class ShiftPatternPage extends ConsumerWidget {
                 sizeFraction: 0.8,
                 curve: Curves.easeInOutCubic,
                 animation: animation,
-                child: _buildPatternCard(
-                    context, ref, pattern, isShadow: false),
+                child: _buildPatternCard(context, ref, pattern, isShadow: false),
               );
             },
             removeItemBuilder: (context, animation, pattern) {
@@ -83,14 +101,16 @@ class ShiftPatternPage extends ConsumerWidget {
             },
           );
         },
-        error: (error, _) =>
-            Center(
-              child: Text("加载失败: $error",
-                  style: const TextStyle(color: Colors.red)),
-            ),
-        loading: () =>
-        const Center(child: CircularProgressIndicator(
-            strokeWidth: 3, color: Colors.blue)),
+        error: (error, _) => Center(
+          child: Text(
+            "加载失败: $error",
+            // 🚀 【优化 6】：将刺眼的纯红换成在黑白底表现都极佳的柔和红
+            style: const TextStyle(color: Colors.redAccent, fontWeight: FontWeight.w500),
+          ),
+        ),
+        loading: () => const Center(
+          child: CircularProgressIndicator(strokeWidth: 3, color: Colors.blue),
+        ),
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
@@ -98,9 +118,8 @@ class ShiftPatternPage extends ConsumerWidget {
           showModalBottomSheet(
             context: context,
             isScrollControlled: true,
-            backgroundColor: Colors.transparent,
-            builder: (context) =>
-                _buildAddElementBottomSheet(context, ref, null),
+            backgroundColor: Colors.transparent, // 确保子弹窗圆角外壳不露白边
+            builder: (context) => _buildAddElementBottomSheet(context, ref, null),
           );
         },
         backgroundColor: Colors.blue,
@@ -109,10 +128,12 @@ class ShiftPatternPage extends ConsumerWidget {
         icon: const Icon(Icons.add, color: Colors.white, size: 20),
         label: const Text(
           "添加周期模式",
-          style: TextStyle(color: Colors.white,
-              fontWeight: FontWeight.bold,
-              fontSize: 14,
-              letterSpacing: 0.5),
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+            fontSize: 14,
+            letterSpacing: 0.5,
+          ),
         ),
       ),
     );
@@ -124,14 +145,28 @@ class ShiftPatternPage extends ConsumerWidget {
       ShiftPattern pattern, {
         bool isShadow = false,
       }) {
-    // 根据模式类型，定义精致微标签的色系
+    // 🚀 【换装天眼 1】：抓取全局暗黑模式状态
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+// 根据模式类型，定义精致微标签的色系
     final bool isFixedWeekly = pattern.patternType == 0;
+
+// ☀️ 白天原本的颜色
+    const Color lightRed = Color(0xFFFEEFEE);
+    const Color lightBlue = Color(0xFFE8F4FF);
+    const Color textRed = Color(0xFFFA5151);
+    const Color textBlue = Color(0xFF0052D9);
+
+// 🚀 核心：用标准的 .withValues 完美实现暗黑模式下的低饱和度标标签背景
     final Color tagBgColor = isFixedWeekly
-        ? const Color(0xFFFEEFEE)
-        : const Color(0xFFE8F4FF);
+        ? (isDark ? const Color(0xFFFA5151).withValues(alpha: 0.15) : lightRed)
+        : (isDark ? const Color(0xFF0052D9).withValues(alpha: 0.15) : lightBlue);
+
+// 🚀 暗黑模式下的文字颜色提亮（用更柔和的亮红/亮蓝，在黑底上极度清晰）
     final Color tagTextColor = isFixedWeekly
-        ? const Color(0xFFFA5151)
-        : const Color(0xFF0052D9);
+        ? (isDark ? const Color(0xFFFF7875) : textRed)
+        : (isDark ? const Color(0xFF597EF7) : textBlue);
+
     final String tagText = isFixedWeekly ? "固定周" : "自定义";
 
     return Padding(
@@ -143,19 +178,20 @@ class ShiftPatternPage extends ConsumerWidget {
           boxShadow: isShadow
               ? [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.08),
+              // 🚀 【优化 2】：阴影降噪
+              color: isDark ? Colors.black38 : Colors.black.withValues(alpha: 0.08),
               blurRadius: 16,
               offset: const Offset(0, 8),
             )
           ]
               : [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.02),
+              color: isDark ? Colors.black12 : Colors.black.withValues(alpha: 0.02),
               offset: const Offset(0, 4),
               blurRadius: 12,
             ),
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.01),
+              color: isDark ? Colors.black26 : Colors.black.withValues(alpha: 0.01),
               offset: const Offset(0, 1),
               blurRadius: 4,
             ),
@@ -164,11 +200,13 @@ class ShiftPatternPage extends ConsumerWidget {
         child: ClipRRect(
           borderRadius: BorderRadius.circular(16),
           child: Material(
-            color: Colors.white,
+            // 🚀 【优化 3】：核心承载色全面对接卡片主题色（白天纯白，黑夜高档深灰）
+            color: Theme.of(context).cardColor,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(16),
               side: BorderSide(
-                  color: Colors.black.withValues(alpha: 0.04), width: 0.8),
+                  color: isDark ? Colors.white.withValues(alpha: 0.04) : Colors.black.withValues(alpha: 0.04),
+                  width: 0.8),
             ),
             child: InkWell(
               onTap: () {
@@ -183,41 +221,39 @@ class ShiftPatternPage extends ConsumerWidget {
               },
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
-                // 抛弃 ListTile，全面采用高自由度 Padding 布局
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // 🌟 第一层：日期标题 + 模式类型微标签并排
                     Row(
                       children: [
-                        // 1. 核心日期区间：用 Expanded + FittedBox 锁死单行，等比例无损缩放，誓死不换行！
                         Expanded(
                           child: FittedBox(
                             fit: BoxFit.scaleDown,
                             alignment: Alignment.centerLeft,
                             child: Text(
                               "${pattern.startDate}  ~  ${pattern.endDate}",
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 16,
-                                color: Color(0xFF1F1F1F),
+                                // 🚀 【优化 4】：日期文字跟随主题自适应
+                                color: Theme.of(context).textTheme.bodyLarge?.color,
                                 letterSpacing: 0.2,
                               ),
                             ),
                           ),
                         ),
                         const SizedBox(width: 12),
-                        // 2. 模式微型轻量标签（取代原本粗笨的方块）
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8,
-                              vertical: 3),
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                           decoration: BoxDecoration(
                             color: tagBgColor,
                             borderRadius: BorderRadius.circular(6),
                           ),
                           child: Text(
                             tagText,
-                            style: TextStyle(color: tagTextColor,
+                            style: TextStyle(
+                                color: tagTextColor,
                                 fontSize: 11,
                                 fontWeight: FontWeight.bold),
                           ),
@@ -227,50 +263,56 @@ class ShiftPatternPage extends ConsumerWidget {
 
                     // 🌟 黄金分割线/间距
                     const SizedBox(height: 14),
-                    Container(height: 0.8, color: const Color(0xFFF5F5F5)),
+                    // 🚀 【优化 5】：卡片内部中横线暗黑隐形化
+                    Container(
+                        height: 0.8,
+                        color: isDark ? Colors.white.withValues(alpha: 0.05) : const Color(0xFFF5F5F5)
+                    ),
                     const SizedBox(height: 12),
 
                     // 🌟 第二层：时钟图标 + 班次流式标签仓
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Padding(
-                          padding: EdgeInsets.only(top: 3.5), // 像素级微调，完美对齐首行标签
-                          child: Icon(Icons.schedule_outlined, size: 14,
-                              color: Color(0xFF8C8C8C)),
+                        Padding(
+                          padding: const EdgeInsets.only(top: 3.5),
+                          child: Icon(
+                            Icons.schedule_outlined,
+                            size: 14,
+                            // 🚀 【优化 6】：小图标灰色适度提亮
+                            color: isDark ? Colors.white38 : const Color(0xFF8C8C8C),
+                          ),
                         ),
                         const SizedBox(width: 8),
 
-                        // 3. 右侧流式胶囊群（自带无感知丝滑换行，拒绝一刀切省略号）
                         Expanded(
                           child: pattern.shiftConfigs.isEmpty
-                              ? const Text(
+                              ? Text(
                             "暂未配置具体班次",
                             style: TextStyle(
-                                color: Color(0xFF8C8C8C), fontSize: 13),
+                                color: isDark ? Colors.white38 : const Color(0xFF8C8C8C),
+                                fontSize: 13),
                           )
                               : Wrap(
-                            spacing: 6, // 胶囊左右间距
-                            runSpacing: 6, // 换行后的上下间距
+                            spacing: 6,
+                            runSpacing: 6,
                             children: pattern.shiftConfigs.map((item) {
                               return Container(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 8, vertical: 3),
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFFF5F7FA),
-                                  // 高级微灰底色
+                                  // 🚀 【优化 7】：右侧流式班次胶囊底色适配
+                                  color: isDark ? Colors.white.withValues(alpha: 0.06) : const Color(0xFFF5F7FA),
                                   borderRadius: BorderRadius.circular(6),
-                                  // 🎯 终极修正：用 Border.all 把你的 BorderSide 属性完美包装起来！
                                   border: Border.all(
-                                    color: Colors.black.withValues(alpha: 0.02),
-                                    // 极淡边框
+                                    color: isDark ? Colors.white.withValues(alpha: 0.02) : Colors.black.withValues(alpha: 0.02),
                                     width: 0.5,
                                   ),
                                 ),
                                 child: Text(
                                   item.name,
-                                  style: const TextStyle(
-                                    color: Color(0xFF434343),
+                                  style: TextStyle(
+                                    // 🚀 【优化 8】：胶囊文字自适应
+                                    color: isDark ? Colors.white70 : const Color(0xFF434343),
                                     fontSize: 12,
                                     fontWeight: FontWeight.w500,
                                   ),
@@ -292,35 +334,30 @@ class ShiftPatternPage extends ConsumerWidget {
   }
 
   Widget _buildAddElementBottomSheet(BuildContext context, WidgetRef ref, ShiftPattern? pattern) {
-    // 🎯 1. 用 ref.read 采取买断快照策略。因为老哥说打开弹窗期间配置表不会变，
-    // 这样直接免去了外面页面 Rebuild 连带导致弹窗重构的后顾之忧。
     final configList = ref.read(shiftConfigViewModelProvider).value ?? <ShiftConfig>[];
-
 
     if (configList.isEmpty) {
       print("警告：数据库中暂无具体班次配置，Spinner可能为空");
     }
 
-    // 🎯 2. 将状态和状态锁声明在 StatefulBuilder 外部作为闭包变量，方便内部持久访问
     int? selectedMode;
     DateTime? startDate;
     DateTime? endDate;
     Map<int, int?>? weeklySelection;
     List<int>? customShiftIds;
-    bool isInitialized = false; // 🔑 生命周期的定海神针锁
-
+    bool isInitialized = false;
     bool isErrorMsg = false;
 
     return StatefulBuilder(
       builder: (BuildContext context, StateSetter setModalState) {
+        // 🚀 【换装天眼】：抓取全局暗黑状态
+        final isDark = Theme.of(context).brightness == Brightness.dark;
 
-        // 🎯 🚀 【核心手术】：挪到 builder 内部的第一行，并且用一把锁死死守住！
         if (!isInitialized) {
           selectedMode = pattern != null ? pattern.patternType : 0;
           startDate = pattern != null ? DateTime.parse(pattern.startDate) : DateTime.now();
           endDate = pattern != null ? DateTime.parse(pattern.endDate) : DateTime.now().add(const Duration(days: 7));
 
-          // 初始化周固定循环字典
           if (pattern != null && pattern.patternType == 0) {
             weeklySelection = {
               1: pattern.shiftConfigIds[0],
@@ -332,7 +369,6 @@ class ShiftPatternPage extends ConsumerWidget {
               7: pattern.shiftConfigIds[6],
             };
           } else {
-            // 兜底：如果没传 pattern，默认拿数据库里的第一个班次填满周一到周日
             weeklySelection = {
               1: configList.isNotEmpty ? configList.first.id : null,
               2: configList.isNotEmpty ? configList.first.id : null,
@@ -344,25 +380,28 @@ class ShiftPatternPage extends ConsumerWidget {
             };
           }
 
-          // 初始化自定义追加队列
           customShiftIds = pattern != null && pattern.patternType == 1
               ? pattern.shiftConfigIds.toList()
               : [];
 
-
-          isInitialized = true; // 🔑 首次跑完立马锁死！以后弹窗内随便调用 setModalState 也绝不复原！
+          isInitialized = true;
         }
 
-        // 3. 动态计算格式化后的日期文本（时刻盯着内存里的局部变量）
         final String formatStart = "${startDate!.year}-${startDate!.month.toString().padLeft(2, '0')}-${startDate!.day.toString().padLeft(2, '0')}";
         final String formatEnd = "${endDate!.year}-${endDate!.month.toString().padLeft(2, '0')}-${endDate!.day.toString().padLeft(2, '0')}";
+
+        // 🚀 抽取暗黑复用的背景色系
+        final containerBg = isDark ? const Color(0xFF25262B) : const Color(0xFFF5F7FA);
+        final cancelBtnBg = isDark ? Colors.white.withValues(alpha: 0.06) : const Color(0xFFF0F2F5);
+        final itemTextColor = Theme.of(context).textTheme.bodyLarge?.color;
 
         return Padding(
           padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
           child: Container(
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.only(topLeft: Radius.circular(24), topRight: Radius.circular(24)),
+            decoration: BoxDecoration(
+              // 🚀 【优化 1】：弹窗大背景全感应（白天纯白，夜间采用高档深灰）
+              color: Theme.of(context).cardColor,
+              borderRadius: const BorderRadius.only(topLeft: Radius.circular(24), topRight: Radius.circular(24)),
             ),
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
             child: Column(
@@ -373,7 +412,7 @@ class ShiftPatternPage extends ConsumerWidget {
                   child: Container(
                     width: 40, height: 4,
                     decoration: BoxDecoration(
-                        color: Colors.grey.withValues(alpha: 0.2),
+                        color: isDark ? Colors.white12 : Colors.grey.withValues(alpha: 0.2),
                         borderRadius: BorderRadius.circular(2)),
                   ),
                 ),
@@ -393,8 +432,9 @@ class ShiftPatternPage extends ConsumerWidget {
                         style: SegmentedButton.styleFrom(
                           selectedBackgroundColor: Colors.blue,
                           selectedForegroundColor: Colors.white,
-                          foregroundColor: const Color(0xFF606266),
-                          side: BorderSide(color: Colors.black.withValues(alpha: 0.08)),
+                          // 🚀 【优化 2】：未选中文字颜色，夜间提亮
+                          foregroundColor: isDark ? const Color(0xFFA1A3A6) : const Color(0xFF606266),
+                          side: BorderSide(color: isDark ? Colors.white.withValues(alpha: 0.08) : Colors.black.withValues(alpha: 0.08)),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                         ),
                         onSelectionChanged: (newSelection) {
@@ -408,7 +448,7 @@ class ShiftPatternPage extends ConsumerWidget {
 
                 // ==================== 第二行：条件联动内容区 ====================
                 if (selectedMode == 0) ...[
-                  const Text("配置一周七天循环班次", style: TextStyle(color: Colors.grey, fontSize: 12, fontWeight: FontWeight.bold)),
+                  Text("配置一周七天循环班次", style: TextStyle(color: isDark ? Colors.white38 : Colors.grey, fontSize: 12, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 8),
                   SizedBox(
                     height: 120,
@@ -424,24 +464,30 @@ class ShiftPatternPage extends ConsumerWidget {
                           margin: const EdgeInsets.only(right: 8, bottom: 4),
                           padding: const EdgeInsets.all(8),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFF5F7FA),
+                            // 🚀 【优化 3】：自适应卡片项目微灰色底色
+                            color: containerBg,
                             borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: Colors.black.withValues(alpha: 0.03)),
+                            border: Border.all(color: isDark ? Colors.white.withValues(alpha: 0.02) : Colors.black.withValues(alpha: 0.03)),
                           ),
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Text(weekTitles[weekDay], style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                              Text(weekTitles[weekDay], style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: itemTextColor)),
                               const SizedBox(height: 8),
                               Expanded(
                                 child: DropdownButton<int>(
                                   value: weeklySelection![weekDay],
                                   isExpanded: true,
                                   underline: const SizedBox(),
+                                  // 🚀 【优化 4】：Dropdown 文字和下拉弹窗背景主题化适配
+                                  dropdownColor: Theme.of(context).cardColor,
                                   style: const TextStyle(color: Colors.blue, fontSize: 12, fontWeight: FontWeight.bold),
                                   icon: const Icon(Icons.arrow_drop_down, size: 16, color: Colors.blue),
-                                  items: configList.map((config) { // 🚀 换成全局快照列表
-                                    return DropdownMenuItem<int>(value: config.id, child: Text(config.name));
+                                  items: configList.map((config) {
+                                    return DropdownMenuItem<int>(
+                                      value: config.id,
+                                      child: Text(config.name, style: TextStyle(color: isDark ? Colors.white70 : Colors.black12, fontSize: 12)),
+                                    );
                                   }).toList(),
                                   onChanged: (val) {
                                     setModalState(() => weeklySelection![weekDay] = val);
@@ -455,7 +501,7 @@ class ShiftPatternPage extends ConsumerWidget {
                     ),
                   ),
                 ] else ...[
-                  const Text("自由定义排班顺序（从左往右按顺序循环）", style: TextStyle(color: Colors.grey, fontSize: 12, fontWeight: FontWeight.bold)),
+                  Text("自由定义排班顺序（从左往右按顺序循环）", style: TextStyle(color: isDark ? Colors.white38 : Colors.grey, fontSize: 12, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 8),
                   Wrap(
                     spacing: 8, runSpacing: 8,
@@ -464,15 +510,16 @@ class ShiftPatternPage extends ConsumerWidget {
                       ...customShiftIds!.asMap().entries.map((entry) {
                         final idx = entry.key;
                         final configId = entry.value;
-                        final targetConfig = configList.where((e) => e.id == configId).firstOrNull; // 🚀 换成全局快照列表
+                        final targetConfig = configList.where((e) => e.id == configId).firstOrNull;
                         return Chip(
                           label: Text(targetConfig?.name ?? "未知班次", style: const TextStyle(fontSize: 12)),
-                          backgroundColor: const Color(0xFFE8F4FF),
-                          labelStyle: const TextStyle(color: Colors.blue),
+                          // 🚀 【优化 5】：已添加的胶囊标签在夜间微调饱和度，防止对比过载
+                          backgroundColor: isDark ? const Color(0xFF0052D9).withValues(alpha: 0.15) : const Color(0xFFE8F4FF),
+                          labelStyle: TextStyle(color: isDark ? const Color(0xFF597EF7) : Colors.blue, fontWeight: FontWeight.bold),
                           padding: EdgeInsets.zero,
                           side: BorderSide.none,
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
-                          deleteIcon: const Icon(Icons.cancel, size: 14, color: Colors.blue),
+                          deleteIcon: Icon(Icons.cancel, size: 14, color: isDark ? const Color(0xFF597EF7) : Colors.blue),
                           onDeleted: () {
                             setModalState(() => customShiftIds!.removeAt(idx));
                           },
@@ -480,19 +527,24 @@ class ShiftPatternPage extends ConsumerWidget {
                       }),
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                        decoration: BoxDecoration(color: const Color(0xFFF5F7FA), borderRadius: BorderRadius.circular(6)),
+                        decoration: BoxDecoration(color: containerBg, borderRadius: BorderRadius.circular(6)),
                         child: DropdownButton<int>(
-                          hint: const Row(
+                          hint: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Icon(Icons.add, size: 14, color: Colors.grey),
-                              Text("追加", style: TextStyle(fontSize: 12, color: Colors.grey))
+                              Icon(Icons.add, size: 14, color: isDark ? Colors.white38 : Colors.grey),
+                              const SizedBox(width: 4),
+                              Text("追加", style: TextStyle(fontSize: 12, color: isDark ? Colors.white38 : Colors.grey))
                             ],
                           ),
+                          dropdownColor: Theme.of(context).cardColor,
                           underline: const SizedBox(),
                           icon: const SizedBox(),
-                          items: configList.map<DropdownMenuItem<int>>((config) { // 🚀 换成全局快照列表
-                            return DropdownMenuItem<int>(value: config.id, child: Text(config.name, style: const TextStyle(fontSize: 13)));
+                          items: configList.map<DropdownMenuItem<int>>((config) {
+                            return DropdownMenuItem<int>(
+                              value: config.id,
+                              child: Text(config.name, style: TextStyle(fontSize: 13, color: isDark ? Colors.white70 : const Color(0xFF1F1F1F))),
+                            );
                           }).toList(),
                           onChanged: (val) {
                             if (val != null) {
@@ -507,7 +559,7 @@ class ShiftPatternPage extends ConsumerWidget {
                 const SizedBox(height: 20),
 
                 // ==================== 第三行：固定日期区间选择 ====================
-                const Text("生效日期范围", style: TextStyle(color: Colors.grey, fontSize: 12, fontWeight: FontWeight.bold)),
+                Text("生效日期范围", style: TextStyle(color: isDark ? Colors.white38 : Colors.grey, fontSize: 12, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 8),
                 Row(
                   children: [
@@ -525,25 +577,25 @@ class ShiftPatternPage extends ConsumerWidget {
                         },
                         child: Container(
                           padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
-                          decoration: BoxDecoration(color: const Color(0xFFF5F7FA), borderRadius: BorderRadius.circular(8)),
+                          decoration: BoxDecoration(color: containerBg, borderRadius: BorderRadius.circular(8)),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text(formatStart, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500)),
-                              const Icon(Icons.calendar_today, size: 14, color: Colors.grey)
+                              Text(formatStart, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: itemTextColor)),
+                              Icon(Icons.calendar_today, size: 14, color: isDark ? Colors.white38 : Colors.grey)
                             ],
                           ),
                         ),
                       ),
                     ),
-                    const Padding(padding: EdgeInsets.symmetric(horizontal: 8), child: Text("至", style: TextStyle(color: Colors.grey))),
+                    Padding(padding: const EdgeInsets.symmetric(horizontal: 8), child: Text("至", style: TextStyle(color: isDark ? Colors.white38 : Colors.grey))),
                     Expanded(
                       child: InkWell(
                         onTap: () async {
                           final picker = await showDatePicker(
                               context: context,
                               initialDate: endDate ?? startDate ?? DateTime.now(),
-                              firstDate:startDate ?? DateTime(2020),
+                              firstDate: startDate ?? DateTime(2020),
                               lastDate: DateTime(2030));
                           if (picker != null) {
                             setModalState(() => endDate = picker);
@@ -551,12 +603,12 @@ class ShiftPatternPage extends ConsumerWidget {
                         },
                         child: Container(
                           padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
-                          decoration: BoxDecoration(color: const Color(0xFFF5F7FA), borderRadius: BorderRadius.circular(8)),
+                          decoration: BoxDecoration(color: containerBg, borderRadius: BorderRadius.circular(8)),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text(formatEnd, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500)),
-                              const Icon(Icons.calendar_today, size: 14, color: Colors.grey)
+                              Text(formatEnd, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: itemTextColor)),
+                              Icon(Icons.calendar_today, size: 14, color: isDark ? Colors.white38 : Colors.grey)
                             ],
                           ),
                         ),
@@ -567,11 +619,11 @@ class ShiftPatternPage extends ConsumerWidget {
                 const SizedBox(height: 28),
 
                 if(isErrorMsg)
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 8.0),
+                  const Padding(
+                    padding: EdgeInsets.only(bottom: 8.0),
                     child: Text(
                       "⚠️ 请选择一个自定义排班！",
-                      style: const TextStyle(color: Colors.redAccent,fontSize: 13,fontWeight: FontWeight.bold),
+                      style: TextStyle(color: Colors.redAccent, fontSize: 13, fontWeight: FontWeight.bold),
                     ),
                   ),
                 // ==================== 第四行：取消、删除、确定生成按钮 ====================
@@ -599,8 +651,9 @@ class ShiftPatternPage extends ConsumerWidget {
                       child: ElevatedButton(
                         onPressed: () => Navigator.pop(context),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFFF0F2F5),
-                          foregroundColor: const Color(0xFF606266),
+                          // 🚀 【优化 6】：取消胶囊按钮大背景夜间收敛
+                          backgroundColor: cancelBtnBg,
+                          foregroundColor: isDark ? Colors.white60 : const Color(0xFF606266),
                           elevation: 0,
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                           padding: const EdgeInsets.symmetric(vertical: 12),
@@ -613,9 +666,8 @@ class ShiftPatternPage extends ConsumerWidget {
                       flex: 2,
                       child: ElevatedButton(
                         onPressed: () async {
-                          print("模式: $selectedMode, 开始: $formatStart, 结束: $formatEnd");
+                          // ... 保持你的 notifier 核心生成业务逻辑不变
                           if (selectedMode == 0) {
-                            print("固定周选值: $weeklySelection");
                             await ref.read(shiftPatternViewModelProvider.notifier).changeShiftPattern(
                                 oldPattern: pattern,
                                 patternType: selectedMode!,
@@ -624,14 +676,10 @@ class ShiftPatternPage extends ConsumerWidget {
                                 shiftConfigIds: weeklySelection!.values.toList().whereType<int>().toList());
                             Navigator.pop(context);
                           } else {
-                            print("自由添加队列: $customShiftIds");
                             if(customShiftIds == null || customShiftIds!.isEmpty){
-                              setModalState(() {
-                                isErrorMsg = true;
-                              });
+                              setModalState(() { isErrorMsg = true; });
                               return;
                             }
-
                             await ref.read(shiftPatternViewModelProvider.notifier).changeShiftPattern(
                                 oldPattern: pattern,
                                 patternType: selectedMode!,
@@ -640,7 +688,6 @@ class ShiftPatternPage extends ConsumerWidget {
                                 shiftConfigIds: customShiftIds!);
                             Navigator.pop(context);
                           }
-
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.blue,
@@ -657,9 +704,8 @@ class ShiftPatternPage extends ConsumerWidget {
                       flex: 2,
                       child: ElevatedButton(
                         onPressed: () async {
-                          print("模式: $selectedMode, 开始: $formatStart, 结束: $formatEnd");
+                          // ... 保持你的排班一键双发 notifier 生成业务逻辑不变
                           if (selectedMode == 0) {
-                            print("固定周选值: $weeklySelection");
                             await ref.read(shiftPatternViewModelProvider.notifier).changeShiftPattern(
                                 oldPattern: pattern,
                                 patternType: selectedMode!,
@@ -676,11 +722,8 @@ class ShiftPatternPage extends ConsumerWidget {
                             );
                             Navigator.pop(context);
                           } else {
-                            print("自由添加队列: $customShiftIds");
                             if(customShiftIds == null || customShiftIds!.isEmpty){
-                              setModalState(() {
-                                isErrorMsg = true;
-                              });
+                              setModalState(() { isErrorMsg = true; });
                               return;
                             }
                             await ref.read(shiftPatternViewModelProvider.notifier).changeShiftPattern(
@@ -699,7 +742,6 @@ class ShiftPatternPage extends ConsumerWidget {
                             );
                             Navigator.pop(context);
                           }
-
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.blue,
@@ -722,31 +764,36 @@ class ShiftPatternPage extends ConsumerWidget {
     );
   }
 
-  void _confirmDelete(BuildContext context, WidgetRef ref,
-      ShiftPattern pattern) {
+// ==================== 确认删除对话框暗黑优化 ====================
+  void _confirmDelete(BuildContext context, WidgetRef ref, ShiftPattern pattern) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     showDialog(
       context: context,
-      builder: (dialogContext) =>
-          AlertDialog(
-            title: const Text("确认删除"),
-            content: Text("确定要删除吗？"),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(dialogContext),
-                child: const Text("算了"),
-              ),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-                onPressed: () async {
-                  Navigator.pop(dialogContext);
-                  await ref
-                      .read(shiftPatternViewModelProvider.notifier)
-                      .deleteShiftPatternById(pattern.id);
-                },
-                child: Text("删除", style: TextStyle(color: Colors.white)),
-              ),
-            ],
+      builder: (dialogContext) => AlertDialog(
+        // 🚀 【优化 7】：自适应背景色
+        backgroundColor: Theme.of(context).cardColor,
+        title: Text("确认删除", style: TextStyle(color: isDark ? Colors.white70 : Colors.black12)),
+        content: Text("确定要删除吗？", style: TextStyle(color: isDark ? Colors.white70 : Colors.black87)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: Text("算了", style: TextStyle(color: isDark ? Colors.white60 : Colors.grey)),
           ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.redAccent, // 🚀 【优化 8】：刺眼红色柔和化
+              foregroundColor: Colors.white,
+              elevation: 0,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            ),
+            onPressed: () async {
+              Navigator.pop(dialogContext);
+              await ref.read(shiftPatternViewModelProvider.notifier).deleteShiftPatternById(pattern.id);
+            },
+            child: const Text("删除", style: TextStyle(fontWeight: FontWeight.bold)),
+          ),
+        ],
+      ),
     );
   }
 }

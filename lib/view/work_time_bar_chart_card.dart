@@ -32,6 +32,8 @@ class _WorkTimeBarChartCard extends State<WorkTimeBarChartCard> {
 
   @override
   Widget build(BuildContext context) {
+    // 🚀 【换装天眼】：抓取全局暗黑模式状态
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final monthStr =
         "${widget.currentMonth.year}年${widget.currentMonth.month.toString().padLeft(2, '0')}月";
 
@@ -39,11 +41,12 @@ class _WorkTimeBarChartCard extends State<WorkTimeBarChartCard> {
       margin: const EdgeInsets.all(8),
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        // 🚀 【优化 1】：大底色感应变换
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.02),
+            color: isDark ? Colors.black26 : Colors.black.withValues(alpha: 0.02),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -55,14 +58,15 @@ class _WorkTimeBarChartCard extends State<WorkTimeBarChartCard> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Expanded(
+              Expanded(
                 child: Text(
                   "工时统计",
                   maxLines: 1,
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF1F1F1F),
+                    // 🚀 【优化 2】：标题颜色自适应
+                    color: Theme.of(context).textTheme.bodyLarge?.color,
                   ),
                 ),
               ),
@@ -73,15 +77,15 @@ class _WorkTimeBarChartCard extends State<WorkTimeBarChartCard> {
                     onPressed: widget.isLoading
                         ? null
                         : () {
-                            final preMonth = DateTime(
-                              widget.currentMonth.year,
-                              widget.currentMonth.month - 1,
-                            );
-                            widget.onMonthChanged(preMonth);
-                          },
-                    icon: const Icon(
+                      final preMonth = DateTime(
+                        widget.currentMonth.year,
+                        widget.currentMonth.month - 1,
+                      );
+                      widget.onMonthChanged(preMonth);
+                    },
+                    icon: Icon(
                       Icons.chevron_left_rounded,
-                      color: Color(0xFF434343),
+                      color: isDark ? Colors.white60 : const Color(0xFF434343),
                     ),
                     padding: EdgeInsets.zero,
                     constraints: const BoxConstraints(),
@@ -89,10 +93,10 @@ class _WorkTimeBarChartCard extends State<WorkTimeBarChartCard> {
                   const SizedBox(width: 8),
                   Text(
                     monthStr,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFF1F1F1F),
+                      color: Theme.of(context).textTheme.bodyLarge?.color,
                     ),
                   ),
                   const SizedBox(width: 8),
@@ -100,15 +104,15 @@ class _WorkTimeBarChartCard extends State<WorkTimeBarChartCard> {
                     onPressed: widget.isLoading
                         ? null
                         : () {
-                            final nextMonth = DateTime(
-                              widget.currentMonth.year,
-                              widget.currentMonth.month + 1,
-                            );
-                            widget.onMonthChanged(nextMonth);
-                          },
-                    icon: const Icon(
+                      final nextMonth = DateTime(
+                        widget.currentMonth.year,
+                        widget.currentMonth.month + 1,
+                      );
+                      widget.onMonthChanged(nextMonth);
+                    },
+                    icon: Icon(
                       Icons.chevron_right_rounded,
-                      color: Color(0xFF434343),
+                      color: isDark ? Colors.white60 : const Color(0xFF434343),
                     ),
                     padding: EdgeInsets.zero,
                     constraints: const BoxConstraints(),
@@ -137,6 +141,7 @@ class _WorkTimeBarChartCard extends State<WorkTimeBarChartCard> {
   }
 
   Widget _buildChartContent() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final hourList = widget.dataList.map((e) => e.hour).toList();
     final double maxH = hourList.isNotEmpty ? hourList.reduce(max) : 0;
 
@@ -151,10 +156,7 @@ class _WorkTimeBarChartCard extends State<WorkTimeBarChartCard> {
       child: LayoutBuilder(
         builder: (context, constraint) {
           final bool isScrollable = idealWidth > constraint.maxWidth;
-
-          final double chartWidth = isScrollable
-              ? idealWidth
-              : constraint.maxWidth;
+          final double chartWidth = isScrollable ? idealWidth : constraint.maxWidth;
 
           return SingleChildScrollView(
             scrollDirection: Axis.horizontal,
@@ -166,11 +168,8 @@ class _WorkTimeBarChartCard extends State<WorkTimeBarChartCard> {
                 padding: const EdgeInsets.only(top: 16, right: 12),
                 child: BarChart(
                   BarChartData(
-                    // 💡 2. 核心：强制靠左对齐，解决第一根柱子离Y轴太远的问题
                     alignment: BarChartAlignment.start,
-                    // 💡 3. 核心：靠左对齐时，必须手动指定柱子之间的横向间距
                     groupsSpace: 28,
-
                     barTouchData: BarTouchData(
                       touchCallback: (FlTouchEvent event, barResponse) {
                         setState(() {
@@ -184,12 +183,10 @@ class _WorkTimeBarChartCard extends State<WorkTimeBarChartCard> {
                         });
                       },
                       touchTooltipData: BarTouchTooltipData(
-                        getTooltipColor: (group) => const Color(0xFF1F1F1F),
+                        // 🚀 【优化 3】：工时气泡夜间采用深色高级灰
+                        getTooltipColor: (group) => isDark ? const Color(0xFF2C2C2E) : const Color(0xFF1F1F1F),
                         tooltipRoundedRadius: 6,
-                        tooltipPadding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 4,
-                        ),
+                        tooltipPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                         tooltipMargin: 4,
                         getTooltipItem: (group, groupIndex, rod, rodIndex) {
                           return BarTooltipItem(
@@ -206,25 +203,21 @@ class _WorkTimeBarChartCard extends State<WorkTimeBarChartCard> {
                     gridData: FlGridData(
                       show: true,
                       drawVerticalLine: false,
-                      horizontalInterval: maxY / 3, //切成三条参考线
+                      horizontalInterval: maxY / 3,
                       getDrawingHorizontalLine: (value) => FlLine(
-                        color: Colors.grey.withValues(alpha: 0.1),
+                        // 🚀 【优化 4】：网格参考线完美变淡
+                        color: isDark ? Colors.white.withValues(alpha: 0.05) : Colors.grey.withValues(alpha: 0.1),
                         strokeWidth: 1,
                         dashArray: [5, 5],
                       ),
                     ),
                     borderData: FlBorderData(show: false),
-
                     minY: 0,
                     maxY: maxY,
                     titlesData: FlTitlesData(
                       show: true,
-                      rightTitles: const AxisTitles(
-                        sideTitles: SideTitles(showTitles: false),
-                      ),
-                      topTitles: const AxisTitles(
-                        sideTitles: SideTitles(showTitles: false),
-                      ),
+                      rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                      topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
                       leftTitles: AxisTitles(
                         sideTitles: SideTitles(
                           showTitles: true,
@@ -232,8 +225,9 @@ class _WorkTimeBarChartCard extends State<WorkTimeBarChartCard> {
                           interval: maxY / 2,
                           getTitlesWidget: (value, meta) => Text(
                             '${value.toStringAsFixed(0)}h',
-                            style: const TextStyle(
-                              color: Colors.black26,
+                            style: TextStyle(
+                              // 🚀 【优化 5】：Y轴单位文本自适应
+                              color: isDark ? Colors.white30 : Colors.black26,
                               fontSize: 10,
                               fontWeight: FontWeight.w500,
                             ),
@@ -254,8 +248,9 @@ class _WorkTimeBarChartCard extends State<WorkTimeBarChartCard> {
                                 padding: const EdgeInsets.only(top: 8.0),
                                 child: Text(
                                   '$day日',
-                                  style: const TextStyle(
-                                    color: Colors.black38,
+                                  style: TextStyle(
+                                    // 🚀 【优化 6】：X轴日期刻度文字自适应
+                                    color: isDark ? Colors.white38 : Colors.black38,
                                     fontSize: 10,
                                   ),
                                 ),
@@ -276,31 +271,22 @@ class _WorkTimeBarChartCard extends State<WorkTimeBarChartCard> {
                             toY: item.hour,
                             gradient: isTouched
                                 ? const LinearGradient(
-                                    colors: [
-                                      Color(0xFF2F74C5),
-                                      Color(0xFF1E5294),
-                                    ],
-                                    begin: Alignment.bottomCenter,
-                                    end: Alignment.topCenter,
-                                  )
+                              colors: [Color(0xFF2F74C5), Color(0xFF1E5294)],
+                              begin: Alignment.bottomCenter,
+                              end: Alignment.topCenter,
+                            )
                                 : const LinearGradient(
-                                    colors: [
-                                      Color(0xFF74B2FA),
-                                      Color(0xFF4A90E2),
-                                    ],
-                                    begin: Alignment.bottomCenter,
-                                    end: Alignment.topCenter,
-                                  ),
-                            width: 8,
-                            borderRadius: const BorderRadius.vertical(
-                              top: Radius.circular(4),
+                              colors: [Color(0xFF74B2FA), Color(0xFF4A90E2)],
+                              begin: Alignment.bottomCenter,
+                              end: Alignment.topCenter,
                             ),
+                            width: 8,
+                            borderRadius: const BorderRadius.vertical(top: Radius.circular(4)),
                             backDrawRodData: BackgroundBarChartRodData(
                               show: true,
                               toY: maxY,
-                              color: const Color(
-                                0xFF4A90E2,
-                              ).withValues(alpha: 0.05),
+                              // 🚀 【优化 7】：灵魂底座调优。夜间如果底座太白太蓝就喧宾夺主了，这里将其弱化为极淡的白透明遮罩
+                              color: isDark ? Colors.white.withValues(alpha: 0.04) : const Color(0xFF4A90E2).withValues(alpha: 0.05),
                             ),
                           ),
                         ],
@@ -317,21 +303,18 @@ class _WorkTimeBarChartCard extends State<WorkTimeBarChartCard> {
   }
 
   Widget _buildErrorState() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return SizedBox(
       height: 180,
       width: double.infinity,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            Icons.error_outline_rounded,
-            size: 40,
-            color: Colors.redAccent.withValues(alpha: 0.6),
-          ),
+          Icon(Icons.error_outline_rounded, size: 40, color: Colors.redAccent.withValues(alpha: 0.6)),
           const SizedBox(height: 8),
           Text(
             widget.errMsg ?? "工时统计加载失败",
-            style: const TextStyle(fontSize: 12, color: Colors.black38),
+            style: TextStyle(fontSize: 12, color: isDark ? Colors.white38 : Colors.black38),
           ),
           const SizedBox(height: 12),
           ElevatedButton.icon(
@@ -339,13 +322,12 @@ class _WorkTimeBarChartCard extends State<WorkTimeBarChartCard> {
             icon: const Icon(Icons.refresh_rounded, size: 14),
             label: const Text("重新加载", style: TextStyle(fontSize: 12)),
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFF5F7FA),
-              foregroundColor: const Color(0xFF434343),
+              // 🚀 【优化 8】：重试按钮夜间降噪
+              backgroundColor: isDark ? Colors.white.withValues(alpha: 0.06) : const Color(0xFFF5F7FA),
+              foregroundColor: isDark ? Colors.white70 : const Color(0xFF434343),
               elevation: 0,
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             ),
           ),
         ],
@@ -353,25 +335,21 @@ class _WorkTimeBarChartCard extends State<WorkTimeBarChartCard> {
     );
   }
 
-  // 🧱 局部抽取：空状态面板
   Widget _buildEmptyState() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return SizedBox(
       height: 180,
       width: double.infinity,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            Icons.bar_chart_rounded,
-            size: 48,
-            color: Colors.grey.withValues(alpha: 0.3),
-          ),
+          Icon(Icons.bar_chart_rounded, size: 48, color: isDark ? Colors.white12 : Colors.grey.withValues(alpha: 0.3)),
           const SizedBox(height: 12),
-          const Text(
+          Text(
             "本月还没有登记工时数据哦~",
             style: TextStyle(
               fontSize: 13,
-              color: Colors.grey,
+              color: isDark ? Colors.white38 : Colors.grey,
               fontWeight: FontWeight.w400,
             ),
           ),

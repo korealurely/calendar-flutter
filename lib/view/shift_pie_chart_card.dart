@@ -7,9 +7,9 @@ class ShiftPieChartCard extends StatefulWidget {
   final DateTime currentMonth;
   final ValueChanged<DateTime> onMonthChanged;
   final bool isLoading;
-  final bool hasError;        // 🚀 新增：错误状态天眼
-  final String? errorMsg;     // 🚀 新增：错误文案
-  final VoidCallback? onRetry; // 🚀 新增：原地重试回调
+  final bool hasError;
+  final String? errorMsg;
+  final VoidCallback? onRetry;
 
   const ShiftPieChartCard({
     super.key,
@@ -31,6 +31,9 @@ class _ShiftPieChartCard extends State<ShiftPieChartCard> {
 
   @override
   Widget build(BuildContext context) {
+    // 🚀 【换装天眼】：提前抓取黑夜状态
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     final totalCount = widget.statList.fold<int>(
       0,
           (sum, item) => sum + item.count,
@@ -43,11 +46,13 @@ class _ShiftPieChartCard extends State<ShiftPieChartCard> {
       margin: const EdgeInsets.all(8),
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        // 🚀 【优化 1】：大底色自适应（白天纯白，黑夜深灰卡片色）
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.02),
+            // 暗黑模式下弱化阴影，防止发灰泛白
+            color: isDark ? Colors.black26 : Colors.black.withValues(alpha: 0.02),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -56,11 +61,11 @@ class _ShiftPieChartCard extends State<ShiftPieChartCard> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // 🔝 标题和切换按钮区（无论发生什么，永远坚固不动）
+          // 🔝 标题和切换按钮区
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Expanded(
+              Expanded(
                 child: Text(
                   "班次统计",
                   maxLines: 1,
@@ -68,7 +73,8 @@ class _ShiftPieChartCard extends State<ShiftPieChartCard> {
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF1F1F1F),
+                    // 🚀 【优化 2】：消灭死色，跟随全局大标题字色
+                    color: Theme.of(context).textTheme.bodyLarge?.color,
                   ),
                 ),
               ),
@@ -76,24 +82,25 @@ class _ShiftPieChartCard extends State<ShiftPieChartCard> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   IconButton(
-                    onPressed: widget.isLoading ? null : () { // 加载中禁用，防止疯狂点击
+                    onPressed: widget.isLoading ? null : () {
                       final preMonth = DateTime(
                         widget.currentMonth.year,
                         widget.currentMonth.month - 1,
                       );
                       widget.onMonthChanged(preMonth);
                     },
-                    icon: const Icon(Icons.chevron_left_rounded, color: Color(0xFF434343)),
+                    // 🚀 【优化 3】：小图标自适应白/灰
+                    icon: Icon(Icons.chevron_left_rounded, color: isDark ? Colors.white60 : const Color(0xFF434343)),
                     padding: EdgeInsets.zero,
                     constraints: const BoxConstraints(),
                   ),
                   const SizedBox(width: 8),
                   Text(
                     monthStr,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFF1F1F1F),
+                      color: Theme.of(context).textTheme.bodyLarge?.color,
                     ),
                   ),
                   const SizedBox(width: 8),
@@ -105,7 +112,7 @@ class _ShiftPieChartCard extends State<ShiftPieChartCard> {
                       );
                       widget.onMonthChanged(nextMonth);
                     },
-                    icon: const Icon(Icons.chevron_right_rounded, color: Color(0xFF434343)),
+                    icon: Icon(Icons.chevron_right_rounded, color: isDark ? Colors.white60 : const Color(0xFF434343)),
                     padding: EdgeInsets.zero,
                     constraints: const BoxConstraints(),
                   ),
@@ -116,21 +123,18 @@ class _ShiftPieChartCard extends State<ShiftPieChartCard> {
 
           const SizedBox(height: 24),
 
-          // 🎯 中枢分流系统：原地调度【报错】、【正常】、【空状态】
+          // 🎯 中枢分流系统
           _buildInnerContent(totalCount),
         ],
       ),
     );
   }
 
-  // 🧱 核心控制器：根据 Riverpod 状态原地交替内容
   Widget _buildInnerContent(int totalCount) {
-    // 🔴 1. 如果报错了，原地渲染高级重试面板，不破坏卡片外壳
     if (widget.hasError) {
       return _buildErrorState();
     }
 
-    // 🟢 2. 正常流：套上你最喜欢的精细化淡化动画
     return AnimatedOpacity(
       opacity: widget.isLoading ? 0.4 : 1.0,
       duration: const Duration(milliseconds: 200),
@@ -142,6 +146,7 @@ class _ShiftPieChartCard extends State<ShiftPieChartCard> {
 
   // 🧱 局部抽取：闭环内置报错面板
   Widget _buildErrorState() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return SizedBox(
       height: 160,
       width: double.infinity,
@@ -154,17 +159,17 @@ class _ShiftPieChartCard extends State<ShiftPieChartCard> {
             widget.errorMsg ?? "数据对账有些小失败",
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: const TextStyle(fontSize: 12, color: Colors.black38),
+            style: TextStyle(fontSize: 12, color: isDark ? Colors.white38 : Colors.black38),
           ),
           const SizedBox(height: 12),
-          // 高级精致的重试小胶囊按钮
           ElevatedButton.icon(
             onPressed: widget.onRetry,
             icon: const Icon(Icons.refresh_rounded, size: 14),
             label: const Text("重新加载", style: TextStyle(fontSize: 12)),
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFF5F7FA),
-              foregroundColor: const Color(0xFF434343),
+              // 🚀 【优化 4】：重试按钮底色完美降噪（暗黑下用白透明遮罩形成轻质灰色，不刺眼）
+              backgroundColor: isDark ? Colors.white.withValues(alpha: 0.06) : const Color(0xFFF5F7FA),
+              foregroundColor: isDark ? Colors.white70 : const Color(0xFF434343),
               elevation: 0,
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -177,6 +182,7 @@ class _ShiftPieChartCard extends State<ShiftPieChartCard> {
 
   // 🧱 局部抽取：空状态积木
   Widget _buildEmptyState() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return SizedBox(
       height: 160,
       width: double.infinity,
@@ -186,12 +192,12 @@ class _ShiftPieChartCard extends State<ShiftPieChartCard> {
           Icon(
             Icons.pie_chart_outline_rounded,
             size: 48,
-            color: Colors.grey.withValues(alpha: 0.4),
+            color: isDark ? Colors.white12 : Colors.grey.withValues(alpha: 0.4),
           ),
           const SizedBox(height: 12),
-          const Text(
+          Text(
             "本月暂无排班统计数据哦~",
-            style: TextStyle(fontSize: 13, color: Colors.grey, fontWeight: FontWeight.w400),
+            style: TextStyle(fontSize: 13, color: isDark ? Colors.white38 : Colors.grey, fontWeight: FontWeight.w400),
           ),
         ],
       ),
@@ -200,6 +206,7 @@ class _ShiftPieChartCard extends State<ShiftPieChartCard> {
 
   // 🧱 局部抽取：图表核心行积木
   Widget _buildChartContent(int totalCount) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Row(
       children: [
         Expanded(
@@ -214,9 +221,17 @@ class _ShiftPieChartCard extends State<ShiftPieChartCard> {
                   children: [
                     Text(
                       "$totalCount",
-                      style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Color(0xFF1F1F1F)),
+                      style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          // 🚀 【优化 5】：饼图中心总天数文字自适应
+                          color: Theme.of(context).textTheme.bodyLarge?.color
+                      ),
                     ),
-                    const Text("总天数", style: TextStyle(fontSize: 11, color: Colors.grey)),
+                    Text(
+                        "总天数",
+                        style: TextStyle(fontSize: 11, color: isDark ? Colors.white38 : Colors.grey)
+                    ),
                   ],
                 ),
                 PieChart(
@@ -271,13 +286,14 @@ class _ShiftPieChartCard extends State<ShiftPieChartCard> {
         titleStyle: TextStyle(
           fontSize: isTouched ? 14 : 11,
           fontWeight: FontWeight.bold,
-          color: Colors.white,
+          color: Colors.white, // 💡 饼图块里本身的文字固定白色最安全清晰
         ),
       );
     });
   }
 
   Widget _buildLegendItem(ShiftStatItem item) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4.0),
       child: Row(
@@ -291,7 +307,12 @@ class _ShiftPieChartCard extends State<ShiftPieChartCard> {
           const SizedBox(width: 8),
           Text(
             item.name,
-            style: const TextStyle(fontSize: 13, color: Color(0xFF434343), fontWeight: FontWeight.w500),
+            style: TextStyle(
+                fontSize: 13,
+                // 🚀 【优化 6】：图例名称颜色跟随换装自适应
+                color: isDark ? Colors.white70 : const Color(0xFF434343),
+                fontWeight: FontWeight.w500
+            ),
           ),
         ],
       ),

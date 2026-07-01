@@ -1,20 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_calendar/data/calendar_shift.dart'; // 💥 确保引入了你的排班模型
+import 'package:flutter_calendar/data/calendar_shift.dart';
 import 'package:flutter_calendar/data/calendar_weight.dart';
 
 class MonthGridView extends StatelessWidget {
   final int firstDayOfWeek;
   final int daysInMonth;
-  final DateTime selectedDate; // 当前选中日期
-  final ValueChanged<DateTime> onDayTap; // 点击回调函数
+  final DateTime selectedDate;
+  final ValueChanged<DateTime> onDayTap;
 
   final int year;
   final int month;
 
-  // 📡 从外层 PageView 传进来的、带着全量配置的当月排班大字典
   final Map<int, CalendarShift> shiftMap;
-
-  final Map<int,List<CalendarWeight>> weightMap;
+  final Map<int, List<CalendarWeight>> weightMap;
 
   const MonthGridView({
     super.key,
@@ -32,15 +30,18 @@ class MonthGridView extends StatelessWidget {
   Widget build(BuildContext context) {
     int totalItems = firstDayOfWeek + daysInMonth;
 
+    // 🚀 【换装天眼 1】：获取当前是否为暗黑模式
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return GridView.builder(
-      shrinkWrap: true, // 💥 必须加这句！否则页面还是会报错
+      shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       padding: EdgeInsets.zero,
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 7,
-        mainAxisSpacing: 4, // 格子行间距不宜过大
+        mainAxisSpacing: 4,
         crossAxisSpacing: 4,
-        childAspectRatio: 0.95, // 💥 拉高纵向空间，给数字下方的小方格留出精致的生存空间
+        childAspectRatio: 0.95,
       ),
       itemCount: totalItems,
       itemBuilder: (context, index) {
@@ -49,10 +50,9 @@ class MonthGridView extends StatelessWidget {
         }
         int day = index - firstDayOfWeek + 1;
 
-        // 🎯 算出当天的绝对身份证 dateId (例如 20260606)
         int targetDateId = year * 10000 + month * 100 + day;
         final currentShift = shiftMap[targetDateId];
-        final shiftConfig = currentShift?.config; // 拿到内存里缝合好的具体配置
+        final shiftConfig = currentShift?.config;
 
         bool isSelected = selectedDate.year == year &&
             selectedDate.month == month &&
@@ -63,18 +63,18 @@ class MonthGridView extends StatelessWidget {
             nowDate.month == month &&
             nowDate.day == day;
 
-        // 🎨 样式分流：数字文本颜色控制
-        Color textColor = Colors.black87;
-        Color circleColor = Colors.transparent; // 基础网格大背景
+        // 🎨 【换装核心 2】：基础文字颜色，跟随系统白天/黑夜的大字颜色（白天藏青黑，夜间奶白）
+        Color textColor = Theme.of(context).textTheme.bodyLarge?.color ?? (isDark ? Colors.white70 : Colors.black87);
+        Color circleColor = Colors.transparent;
 
         if (isSelected) {
-          textColor = Colors.blue; // 优先满足：被选中的颜色
-          circleColor = Colors.blue.withValues(alpha: 0.15); // 选中时的圆形浅色背景
+          // 🚀 【换装核心 3】：选中状态适配
+          // 如果是黑夜模式，选中的字用亮一点的淡蓝，底色圈圈用带透明度的深蓝，防止刺眼
+          textColor = isDark ? const Color(0xFF5A9FFF) : Colors.blue;
+          circleColor = isDark ? Colors.blue.withValues(alpha: 0.25) : Colors.blue.withValues(alpha: 0.15);
         } else if (isToday) {
-          textColor = Colors.red; // 其次满足：如果是今天，但没被选中，显示高亮色
-        } else if (shiftConfig != null) {
-          // 如果有班次，文字可以稍微加深或者配合班次颜色微调，这里保持舒适的黑白对比
-          textColor = Colors.black87;
+          // 今天但没选中的高亮红，黑夜模式下用稍微带点橙色调的红（比如橙红），在黑底上更醒目
+          textColor = isDark ? const Color(0xFFFF5252) : Colors.red;
         }
 
         return GestureDetector(
@@ -115,25 +115,23 @@ class MonthGridView extends StatelessWidget {
                         style: const TextStyle(
                           fontSize: 9,
                           fontWeight: FontWeight.bold,
-                          color: Colors.white,
+                          color: Colors.white, // 💡 班次格子里的字，不论白天黑夜，统一白色最清晰
                           height: 1.1,
                         ),
                       ),
                     ),
                   )
                 else
-                // 💡 占位符：保证没班次时，下方的绿点也不会往上顶
                   const Padding(
                     padding: EdgeInsets.only(top: 3.0),
                     child: SizedBox(height: 13),
                   ),
 
-                // 3. 🟢 【全新魔改】：体重小绿点
+                // 3. 🟢 体重小绿点
                 Padding(
-                  padding: const EdgeInsets.only(top: 4.0), // 跟上方的班次标签拉开小距离
+                  padding: const EdgeInsets.only(top: 4.0),
                   child: Builder(
                     builder: (context) {
-                      // 🎯 检查 weightMap 里有没有当天的体重记录（并且列表不为空）
                       final hasWeight = weightMap.containsKey(targetDateId) &&
                           weightMap[targetDateId]!.isNotEmpty;
 
@@ -141,14 +139,13 @@ class MonthGridView extends StatelessWidget {
                         return Container(
                           width: 5,
                           height: 5,
-                          decoration: const BoxDecoration(
-                            color: Colors.green, // 🟩 充满生机的小绿点
+                          decoration: BoxDecoration(
+                            // 🚀 【换装核心 4】：小绿点在黑夜下可以用亮荧光绿，白天用普通绿，视觉质感直接拉满
+                            color: isDark ? const Color(0xFF2ECC71) : Colors.green,
                             shape: BoxShape.circle,
                           ),
                         );
                       }
-                      // 💡 黄金防抖细节：如果没有体重，塞一个等高的透明占位符
-                      // 确保所有日期格子的数字和标签都在同一起跑线！
                       return const SizedBox(height: 5);
                     },
                   ),

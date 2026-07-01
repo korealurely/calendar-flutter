@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_calendar/l10n/app_localizations.dart';
 import 'package:flutter_calendar/pages/calendar_page.dart';
 import 'package:flutter_calendar/pages/shift_config_page.dart';
 import 'package:flutter_calendar/pages/chart_page.dart';
@@ -9,43 +10,36 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 class MainScreen extends ConsumerWidget {
   const MainScreen({super.key});
 
-  // 4个业务页面千层饼
   final List<Widget> _pages = const [
     CalendarPage(),
-    //const Center(child: Text('模板', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold))),
     ShiftConfigPage(),
-    //Center(child: Text('AI', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold))),
     ChartPage(),
-    //const ShiftPatternPage(),
-    //Center(child: Text('我的', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold))),
-    //Center(child: Text('我的1', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold))),
     MyPage(),
   ];
 
   @override
-  Widget build(BuildContext context,WidgetRef ref) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final currentIndex = ref.watch(mainTabIndexProvider);
-    // 💡 顶层包裹 Theme，统一宏观调控 NavigationBar 的文字与胶囊背景
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    // 🚀 核心：抽取你的主题主色调（比如白天用蓝色，黑夜用稍微亮一点的淡蓝，或者统一用你的 Color(0xFF4A90E2)）
+    final activeColor = isDark ? const Color(0xFF5A9FFF) : const Color(0xFF4A90E2);
+
     return Theme(
       data: Theme.of(context).copyWith(
         navigationBarTheme: NavigationBarThemeData(
-          // 1. 💥 彻底干掉 Material 3 自带的蓝色椭圆高亮块，回归极简
           indicatorColor: Colors.transparent,
-
-          // 2. 💥 精准控制文字在不同状态下的颜色
           labelTextStyle: WidgetStateProperty.resolveWith<TextStyle>((states) {
             if (states.contains(WidgetState.selected)) {
-              // 选中时：高亮蓝色，加粗
-              return const TextStyle(
+              return TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.bold,
-                color: Colors.blue,
+                color: activeColor, // 🚀 动态跟随激活色
               );
             }
-            // 未选中时：低调灰色（其实未选中时会被下面的 labelBehavior 隐藏，这里作为安全双保险）
-            return const TextStyle(
+            return TextStyle(
               fontSize: 12,
-              color: Colors.grey,
+              color: isDark ? Colors.white38 : Colors.grey, // 🚀 未选中文字颜色适配
             );
           }),
         ),
@@ -55,41 +49,38 @@ class MainScreen extends ConsumerWidget {
           index: currentIndex,
           children: _pages,
         ),
-
         bottomNavigationBar: NavigationBar(
           selectedIndex: currentIndex,
           onDestinationSelected: (int index) {
             ref.read(mainTabIndexProvider.notifier).state = index;
           },
-
           height: 60,
-          backgroundColor: Colors.white,
+          // 🚀 【换装核心 1】：去除死白，让背景自动去读卡片色（白天纯白，夜间深灰 0xFF1E1E1E）
+          backgroundColor: Theme.of(context).cardColor,
           elevation: 10,
-          animationDuration: const Duration(milliseconds: 300), // 300ms 切换更干脆丝滑
-
-          // 3. 💥 核心：仅在被选中时才优雅地浮现底部文字标签
+          animationDuration: const Duration(milliseconds: 300),
           labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
-
-          destinations: const [
+          destinations: [
             NavigationDestination(
-              icon: Icon(Icons.calendar_month_outlined, color: Colors.black54),
-              selectedIcon: Icon(Icons.calendar_month, color: Colors.blue),
-              label: '主页',
+              // 🚀 【换装核心 2】：未选中的图标在黑夜下用半透明白（white54），白天用半透明黑（black54）
+              icon: Icon(Icons.calendar_month_outlined, color: isDark ? Colors.white54 : Colors.black54),
+              selectedIcon: Icon(Icons.calendar_month, color: activeColor),
+              label: AppLocalizations.of(context)!.homePage,
             ),
             NavigationDestination(
-              icon: Icon(Icons.schedule_outlined, color: Colors.black54),
-              selectedIcon: Icon(Icons.schedule, color: Colors.blue),
-              label: '排班',
+              icon: Icon(Icons.schedule_outlined, color: isDark ? Colors.white54 : Colors.black54),
+              selectedIcon: Icon(Icons.schedule, color: activeColor),
+              label: AppLocalizations.of(context)!.shift,
             ),
             NavigationDestination(
-              icon: Icon(Icons.android_outlined, color: Colors.black54),
-              selectedIcon: Icon(Icons.android, color: Colors.blue),
-              label: '统计',
+              icon: Icon(Icons.android_outlined, color: isDark ? Colors.white54 : Colors.black54),
+              selectedIcon: Icon(Icons.android, color: activeColor),
+              label: AppLocalizations.of(context)!.statistic,
             ),
             NavigationDestination(
-              icon: Icon(Icons.person_outline, color: Colors.black54),
-              selectedIcon: Icon(Icons.person, color: Colors.blue),
-              label: '我的',
+              icon: Icon(Icons.person_outline, color: isDark ? Colors.white54 : Colors.black54),
+              selectedIcon: Icon(Icons.person, color: activeColor),
+              label: AppLocalizations.of(context)!.my,
             ),
           ],
         ),
@@ -97,4 +88,3 @@ class MainScreen extends ConsumerWidget {
     );
   }
 }
-

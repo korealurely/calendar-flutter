@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_calendar/data/shift_config.dart';
 import 'package:flutter_calendar/provider/shift_config_provider.dart';
 
-// 🚀 引入咱们刚刚导进来的硬核 Diff 动画库
+// 🚀 引入咱们的硬核 Diff 动画库
 import 'package:implicitly_animated_reorderable_list_2/implicitly_animated_reorderable_list_2.dart';
 import 'package:implicitly_animated_reorderable_list_2/transitions.dart';
 import 'package:flutter_calendar/view/shift_config_edit_bottom_sheet.dart';
@@ -12,27 +12,39 @@ import 'package:flutter_calendar/view/shift_config_edit_bottom_sheet.dart';
 class ShiftConfigPage extends ConsumerWidget {
   const ShiftConfigPage({super.key});
 
-  //弹出窗口
+  // 🚀 【优化 1】：二次确认删除弹窗，完美支持暗黑换装
   void _confirmDelete(BuildContext context, WidgetRef ref, ShiftConfig config) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text("确认删除"),
-        content: Text("确定要删除【${config.name}】吗？"),
+        // 自动读取暗黑下的卡片底色，不亮瞎眼
+        backgroundColor: Theme.of(context).cardColor,
+        title: Text(
+            "确认删除",
+            style: TextStyle(fontWeight: FontWeight.bold, color: Theme.of(context).textTheme.bodyLarge?.color)
+        ),
+        content: Text(
+          "确定要删除【${config.name}】吗？",
+          style: TextStyle(color: isDark ? Colors.white70 : Colors.black87),
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: const Text("算了"),
+            child: Text("算了", style: TextStyle(color: isDark ? Colors.white38 : Colors.grey)),
           ),
           ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFFFF5252), // 暗黑下更通透的红
+              elevation: 0,
+            ),
             onPressed: () async {
               Navigator.pop(dialogContext);
               await ref
                   .read(shiftConfigViewModelProvider.notifier)
                   .deleteConfigById(config.id);
             },
-            child: const Text("删除", style: TextStyle(color: Colors.white)),
+            child: const Text("删除", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
           ),
         ],
       ),
@@ -41,14 +53,20 @@ class ShiftConfigPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-
     final configListSync = ref.watch(shiftConfigViewModelProvider);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F7FA),
+      // 🚀 【优化 2】：脚手架背景自适应（白天浅灰，夜间纯黑）
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        title: const Text(
+        title: Text(
           "班次管理",
-          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 16,
+            color: Theme.of(context).textTheme.bodyLarge?.color, // 🚀 文字自适应
+          ),
         ),
         actions: [
           TextButton(
@@ -59,21 +77,22 @@ class ShiftConfigPage extends ConsumerWidget {
                 ),
               );
             },
-            child: Text("模式",style: TextStyle(fontSize: 14,fontWeight: FontWeight.bold)),
+            child: const Text("模式", style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.blue)),
           ),
         ],
-        backgroundColor: Colors.white,
+        backgroundColor: Theme.of(context).cardColor, // 🚀 顶栏自适应
         elevation: 0,
         scrolledUnderElevation: 0,
         centerTitle: true,
+        iconTheme: IconThemeData(color: isDark ? Colors.white70 : Colors.black87), // 🚀 返回键图标自适应
       ),
       body: configListSync.when(
         data: (dbList) {
           if (dbList.isEmpty) {
-            return const Center(
+            return Center(
               child: Text(
                 "暂无班次配置，点击右下角+添加",
-                style: TextStyle(color: Colors.grey),
+                style: TextStyle(color: isDark ? Colors.white38 : Colors.grey),
               ),
             );
           }
@@ -87,7 +106,7 @@ class ShiftConfigPage extends ConsumerWidget {
                 sizeFraction: 0.7,
                 curve: Curves.easeInOutCubic,
                 animation: animation,
-                child: _buildShiftCard(context, ref, config, index),
+                child: _buildShiftCard(context, ref, config, index, isShadow: false), // 修正：你的卡片里默认带尾部删除按钮，应该是 isShadow: false 吧
               );
             },
             removeItemBuilder: (context, animation, config) {
@@ -101,19 +120,13 @@ class ShiftConfigPage extends ConsumerWidget {
           );
         },
         loading: () =>
-            const Center(child: CircularProgressIndicator(strokeWidth: 3)),
+        const Center(child: CircularProgressIndicator(strokeWidth: 3)),
         error: (err, _) => Center(
           child: Text("翻车了：$err", style: const TextStyle(color: Colors.red)),
         ),
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
-          print("添加班次");
-          // Navigator.of(context, rootNavigator: false).push(
-          //   MaterialPageRoute(
-          //     builder: (context) => const ShiftPatternPage(),
-          //   ),
-          // );
           showModalBottomSheet(
             context: context,
             isScrollControlled: true,
@@ -132,12 +145,14 @@ class ShiftConfigPage extends ConsumerWidget {
   }
 
   Widget _buildShiftCard(
-    BuildContext context,
-    WidgetRef ref,
-    ShiftConfig config,
-    int index, {
-    bool isShadow = true,
-  }) {
+      BuildContext context,
+      WidgetRef ref,
+      ShiftConfig config,
+      int index, {
+        bool isShadow = true,
+      }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Padding(
       key: ValueKey(config.id),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
@@ -146,32 +161,27 @@ class ShiftConfigPage extends ConsumerWidget {
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.03),
+              // 🚀 【优化 3】：暗黑模式下的卡片阴影弱化收敛
+              color: isDark ? Colors.black26 : Colors.black.withValues(alpha: 0.03),
               offset: const Offset(0, 4),
               blurRadius: 12,
               spreadRadius: 0,
-            ),
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.01),
-              offset: const Offset(0, 1),
-              blurRadius: 4,
             ),
           ],
         ),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(16),
           child: Material(
-            color: Colors.white,
+            color: Theme.of(context).cardColor, // 🚀 【优化 4】：卡片底色全自动适配
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(16),
               side: BorderSide(
-                color: Colors.black.withValues(alpha: 0.04),
+                color: isDark ? Colors.white10 : Colors.black.withValues(alpha: 0.04), // 🚀 边框弱化
                 width: 0.8,
               ),
             ),
             child: ListTile(
               onTap: () {
-                //_confirmDelete(context, ref, config);
                 showModalBottomSheet(
                   context: context,
                   isScrollControlled: true,
@@ -195,7 +205,7 @@ class ShiftConfigPage extends ConsumerWidget {
                 child: Text(
                   config.label,
                   style: const TextStyle(
-                    color: Colors.white,
+                    color: Colors.white, // 班次标签里的字固定白色最清晰
                     fontWeight: FontWeight.bold,
                     fontSize: 16,
                   ),
@@ -203,10 +213,10 @@ class ShiftConfigPage extends ConsumerWidget {
               ),
               title: Text(
                 config.name,
-                style: const TextStyle(
+                style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 16,
-                  color: Color(0xFF2D3142),
+                  color: Theme.of(context).textTheme.bodyLarge?.color, // 🚀 【优化 5】：班次名字颜色自适应
                 ),
               ),
               subtitle: Padding(
@@ -216,13 +226,14 @@ class ShiftConfigPage extends ConsumerWidget {
                     Icon(
                       Icons.schedule_outlined,
                       size: 13,
-                      color: Colors.grey.withValues(alpha: 0.8),
+                      color: isDark ? Colors.white38 : Colors.grey.withValues(alpha: 0.8), // 🚀 图标提亮
                     ),
                     const SizedBox(width: 4),
                     Text(
                       "${config.startTime} - ${config.endTime}",
-                      style: const TextStyle(
-                        color: Color(0xFF909399),
+                      style: TextStyle(
+                        // 🚀 【优化 6】：时间范围颜色适配
+                        color: isDark ? Colors.white60 : const Color(0xFF909399),
                         fontSize: 13,
                       ),
                     ),
@@ -231,15 +242,16 @@ class ShiftConfigPage extends ConsumerWidget {
               ),
               trailing: !isShadow
                   ? IconButton(
-                      onPressed: () => {
-                        //_confirmDelete(context, ref, config)
-                      },
-                      icon: const Icon(
-                        Icons.delete_outline_rounded,
-                        color: Colors.redAccent,
-                        size: 22,
-                      ),
-                    )
+                onPressed: () {
+                  // 🚀 顺手帮你把删除按钮的二次确认弹窗接通
+                  _confirmDelete(context, ref, config);
+                },
+                icon: const Icon(
+                  Icons.delete_outline_rounded,
+                  color: Color(0xFFFF5252), // 暗黑模式下也极其漂亮的荧光红
+                  size: 22,
+                ),
+              )
                   : null,
             ),
           ),

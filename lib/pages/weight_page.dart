@@ -12,17 +12,27 @@ class WeightPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Compose BLE to Flutter',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: Colors.deepPurple,
-          brightness: Brightness.light,
-        ),
-        useMaterial3: true,
-      ),
-      home: const MainActivity(),
-    );
+    // return MaterialApp(
+    //   title: 'Compose BLE to Flutter',
+    //   // 🚀 【优化 1】：全面解耦硬编码，让它完美支持并自动跟随系统进行日夜切换
+    //   theme: ThemeData(
+    //     colorScheme: ColorScheme.fromSeed(
+    //       seedColor: Colors.blue,
+    //       brightness: Brightness.light,
+    //     ),
+    //     useMaterial3: true,
+    //   ),
+    //   darkTheme: ThemeData(
+    //     colorScheme: ColorScheme.fromSeed(
+    //       seedColor: Colors.blue,
+    //       brightness: Brightness.dark,
+    //     ),
+    //     useMaterial3: true,
+    //   ),
+    //   themeMode: ThemeMode.system, // 自动追随系统天色
+    //   home: const MainActivity(),
+    // );
+    return const MainActivity();
   }
 }
 
@@ -34,67 +44,37 @@ class MainActivity extends StatefulWidget {
 }
 
 class _MainActivityState extends State<MainActivity> {
-  // 用来在全局（甚至 initState 里）弹出 SnackBar 的钥匙
   final GlobalKey<ScaffoldMessengerState> _scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
-
-  // 🌟 核心修复：用变量持久化单例的流订阅，以便在 dispose 时销毁
-  //StreamSubscription<String>? _mqttMsgSubscription;
 
   @override
   void initState() {
     super.initState();
 
-    // 在你连接 MQTT 之前（比如启动 App 时），调用这个方法
     Future<void> triggerIOSLocalNetworkDialog() async {
       if (!Platform.isIOS) return;
-
       try {
         print("🌟 正在强行唤醒 iOS 本地网络权限弹窗...");
-        // 随便找一个内网不可能存在的 IP 去尝试绑定或者连接一次
         final socket = await Socket.connect('192.168.50.254', 80, timeout: const Duration(seconds: 1));
         await socket.close();
       } catch (e) {
-        // 这里必然会报错，我们不用管它，因为我们的目的只是为了惊动 iOS 系统，让它弹窗！
         print("👋 弹窗唤醒动作已触发：$e");
       }
     }
 
-    // 1. 启动即检查并动态请求蓝牙与定位权限（对应 Android 的 checkAndRequestPermissions）
     _checkAndRequestPermissions();
 
-    // 2. 对应 LaunchedEffect：监听来自 MQTT 核心层的一次性通知，弹出 SnackBar
-    // _mqttMsgSubscription =  MqttManager.instance.isWeightMsgSend.listen((message) {
-    //   final snackBar = SnackBar(
-    //     content: Text(message),
-    //     duration: const Duration(seconds: 2),
-    //     behavior: SnackBarBehavior.floating,
-    //   );
-    //   _scaffoldMessengerKey.currentState?.showSnackBar(snackBar);
-    // });
-
-    // 3. 顺便模拟连接一下你的 MQTT Broker（实际开发换成你的服务器 IP）
-    //MqttManager.instance.connect("192.168.50.150");
-
-    // 在你页面的 initState 里，或者 BleManager 的构造函数里写这行代码：
     FlutterBluePlus.adapterState.first.then((state) {
       print("冷启动提早唤醒蓝牙大总管，当前状态: $state");
     });
   }
 
-
   @override
   void dispose() {
-    // 4. 对应 Compose 的 DisposableEffect { onDispose { stopScan() } }
-    // 当页面退出或应用关闭时，确保断开蓝牙扫描，防止后台疯狂耗电
     BleManager.instance.stopScan();
-    //MqttManager.instance.dispose();
-    //_mqttMsgSubscription?.cancel();
     super.dispose();
   }
 
-  // 动态权限申请逻辑
   Future<void> _checkAndRequestPermissions() async {
-    // 同时请求蓝牙扫描、连接以及定位权限（Android 低版本和某些设备必须开定位才能搜到蓝牙）
     Map<Permission, PermissionStatus> statuses = await [
       Permission.bluetoothScan,
       Permission.bluetoothConnect,
@@ -113,11 +93,12 @@ class _MainActivityState extends State<MainActivity> {
 
   @override
   Widget build(BuildContext context) {
-    // 用 ScaffoldMessenger 包裹，确保弹窗随时可用
     return ScaffoldMessenger(
       key: _scaffoldMessengerKey,
       child: Scaffold(
-        body: SafeArea( // 自动处理 EdgeToEdge / 避开刘海屏
+        // 🚀 【优化 2】：大背景色感应动态换装（白天清亮，夜间收拢为哑光高级黑）
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        body: SafeArea(
           child: Padding(
             padding: const EdgeInsets.all(24.0),
             child: _buildScaleScreen(context),
@@ -127,9 +108,9 @@ class _MainActivityState extends State<MainActivity> {
     );
   }
 
-  // 核心主大屏（对应 @Composable fun ScaleScreen）
   Widget _buildScaleScreen(BuildContext context) {
-    // 利用嵌套 StreamBuilder，完美对应 Compose 的两个 collectAsState()
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return StreamBuilder<bool>(
       stream: BleManager.instance.isScanning,
       initialData: false,
@@ -141,31 +122,29 @@ class _MainActivityState extends State<MainActivity> {
           builder: (context, dataSnapshot) {
             final CalendarWeight? data = dataSnapshot.data;
 
-            // // 当数据稳定锁定，且处于扫描状态时，自动触发 MQTT 上报
-            // if (data != null && data.isStable && scanning) {
-            //   // 触发一次性上报，由于在 build 里，内部单例有去重机制或你也可以加个标志位控制次数
-            //   MqttManager.instance.publishWeight(data.weight, data.impedance);
-            // }
-
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
+                Text(
                   '我的体脂秤',
-                  style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold,
+                    // 🚀 【优化 3】：消灭死黑死白字
+                    color: Theme.of(context).textTheme.bodyLarge?.color,
+                  ),
                 ),
                 const SizedBox(height: 24),
 
-                // 1. 控制按钮 (对应 Compose 的 Button)
                 SizedBox(
                   width: double.infinity,
                   height: 48,
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      // 动态切换颜色：如果是正在扫描显示红色（Error），否则显示默认深色
                       backgroundColor: scanning ? Theme.of(context).colorScheme.error : Theme.of(context).colorScheme.primary,
                       foregroundColor: Colors.white,
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(100)),
+                      elevation: 0, // Material 3 胶囊扁平化高档感
                     ),
                     onPressed: () {
                       if (scanning) {
@@ -174,31 +153,26 @@ class _MainActivityState extends State<MainActivity> {
                         BleManager.instance.startScan();
                       }
                     },
-                    child: Text(scanning ? "停止扫描" : "开始测量", style: const TextStyle(fontSize: 16)),
+                    child: Text(scanning ? "停止扫描" : "开始测量", style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                   ),
                 ),
                 const SizedBox(height: 32),
 
-                // 2. 体重显示卡片 (对应 Compose 的 Card)
                 _buildWeightCard(context, data, scanning),
                 const SizedBox(height: 24),
 
-                // 3. 底部雷达进度条：如果正在扫描且没有数据
                 if (scanning && data == null) ...[
                   const LinearProgressIndicator(),
-                  const Padding(
-                    padding: EdgeInsets.only(top: 8.0),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8.0),
                     child: Text(
                       '正在寻找 MIBFS 体脂秤...',
-                      style: TextStyle(fontSize: 12, color: Colors.grey),
+                      style: TextStyle(fontSize: 12, color: isDark ? Colors.white38 : Colors.grey),
                     ),
                   ),
                 ],
 
-                const Spacer(), // 撑开中间，将 MQTT 状态顶到最底下
-
-                // 4. MQTT 状态监控区域
-                //_buildMqttStatusSection(),
+                const Spacer(),
               ],
             );
           },
@@ -207,14 +181,18 @@ class _MainActivityState extends State<MainActivity> {
     );
   }
 
-  // 抽出封装的体重展示卡片组件
   Widget _buildWeightCard(BuildContext context, CalendarWeight? data, bool scanning) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final bool isDataValid = data != null && data.weight > 0 && scanning;
     final String weightDisplay = isDataValid ? data.weight.toStringAsFixed(2) : "--.-";
+
+    // 🚀 【优化 4】：锁定数值文本在暗黑模式下调亮，避免暗底看纯绿导致视网膜疲劳
+    final lockTextColor = isDark ? const Color(0xFF81C784) : const Color(0xFF2E7D32);
 
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
+        // 🚀 【优化 5】：卡片背景自适应，夜间采用 Material 3 的标准容器底色，通透有呼吸感
         color: Theme.of(context).colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(16),
       ),
@@ -223,7 +201,7 @@ class _MainActivityState extends State<MainActivity> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-             Text(
+            Text(
               '实时体重',
               style: TextStyle(
                 color: Theme.of(context).colorScheme.onSurfaceVariant,
@@ -233,106 +211,77 @@ class _MainActivityState extends State<MainActivity> {
             ),
             const SizedBox(height: 8),
 
-            // 🌟 核心特效：带数字跳动动画的文本 (等价于 Compose 的 AnimatedContent)
             Row(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 AnimatedSwitcher(
                   duration: const Duration(milliseconds: 300),
-                  // 自定义过渡动画：实现类似 Compose 的垂直滑入滑出 + 渐变
                   transitionBuilder: (Widget child, Animation<double> animation) {
                     final inAnimation = Tween<Offset>(
-                      begin: const Offset(0.0, 0.4), // 从下方滑入
+                      begin: const Offset(0.0, 0.2),
                       end: Offset.zero,
-                    ).animate(CurvedAnimation(parent: animation, curve: Curves.easeOut));
+                    ).animate(CurvedAnimation(parent: animation, curve: Curves.easeOutCubic));
 
                     return FadeTransition(
                       opacity: animation,
                       child: SlideTransition(position: inAnimation, child: child),
                     );
                   },
-                  // 💡 必须加上这一行 ValueKey！每次文本变动，Switcher 才会认为这是新组件并触发动画
                   child: Text(
                     weightDisplay,
                     key: ValueKey<String>(weightDisplay),
                     style: TextStyle(
                       fontSize: 56,
                       fontWeight: FontWeight.bold,
-                      // 如果数值锁定了显示绿色（0xFF4CAF50），否则显示默认文字颜色
-                      color: (data?.isStable == true && scanning) ? const Color(0xFF4CAF50) : Theme.of(context).colorScheme.onSurface,
+                      // 🚀 【优化 6】：数字跳动过程中的主文字颜色平滑自适应
+                      color: (data?.isStable == true && scanning)
+                          ? lockTextColor
+                          : Theme.of(context).colorScheme.onSurface,
                     ),
                   ),
                 ),
-                const Padding(
-                  padding: EdgeInsets.only(bottom: 12.0, left: 4.0),
-                  child: Text(' kg', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 12.0, left: 4.0),
+                  child: Text(
+                      ' kg',
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Theme.of(context).colorScheme.onSurface,
+                      )
+                  ),
                 ),
               ],
             ),
             const SizedBox(height: 16),
 
-            // 5. 阻抗数据展示
             Text(
               "身体阻抗: ${(data != null && data.impedance != 0 && scanning) ? "${data.impedance} Ω" : "测量中..."}",
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
             ),
 
-            // 6. 稳定锁定的绿色小标签
             if (data?.isStable == true && scanning) ...[
               const SizedBox(height: 12),
               Container(
                 decoration: BoxDecoration(
-                  color: const Color(0xFFE8F5E9),
-                  borderRadius: BorderRadius.circular(4),
+                  // 🚀 【优化 7】：锁定状态标签色感应变换。黑夜下使用极淡的半透明绿底遮罩
+                  color: isDark ? const Color(0xFF81C784).withValues(alpha: 0.15) : const Color(0xFFE8F5E9),
+                  borderRadius: BorderRadius.circular(6),
                 ),
-                padding: const EdgeInsets.only(left: 8, right: 8, top: 4, bottom: 4),
-                child: const Text(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                child: Text(
                   '已锁定数值',
-                  style: TextStyle(color: Color(0xFF2E7D32), fontSize: 12, fontWeight: FontWeight.bold),
+                  style: TextStyle(color: lockTextColor, fontSize: 12, fontWeight: FontWeight.bold),
                 ),
               ),
             ]
           ],
         ),
       ),
-    );
-  }
-
-  // 抽出封装的底部 MQTT 连接状态
-  Widget _buildMqttStatusSection() {
-    return StreamBuilder<bool>(
-      stream: MqttManager.instance.isMqttConnected,
-      // initialData: false,
-      builder: (context, snapshot) {
-        final bool isMqttConnected = snapshot.data ?? false;
-
-        if (isMqttConnected) {
-          return const Padding(
-            padding: EdgeInsets.symmetric(vertical: 8.0),
-            child: Text(
-              'Mqtt服务器已连接',
-              style: TextStyle(fontSize: 12, color: Colors.grey, fontWeight: FontWeight.w500),
-            ),
-          );
-        } else {
-          return Row(
-            children: [
-              const Text(
-                'Mqtt服务器已断开，请重连',
-                style: TextStyle(fontSize: 12, color: Colors.red, fontWeight: FontWeight.w500),
-              ),
-              const Spacer(),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(visualDensity: VisualDensity.compact),
-                onPressed: () {
-                  MqttManager.instance.connect("192.168.50.150"); // 点击重连
-                },
-                child: const Text('重连'),
-              )
-            ],
-          );
-        }
-      },
     );
   }
 }
