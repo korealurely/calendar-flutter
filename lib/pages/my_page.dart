@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_calendar/l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_calendar/provider/theme_provider.dart';
 
@@ -28,7 +29,7 @@ class _ConsumerStatefulWidget extends ConsumerState<ConsumerStatefulWidget>{
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         title: Text(
-          "我的",
+          AppLocalizations.of(context)!.myPageTitle,
           style: TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 16,
@@ -47,14 +48,14 @@ class _ConsumerStatefulWidget extends ConsumerState<ConsumerStatefulWidget>{
           children: [
             _buildCard(
               context,
-              "清除缓存",
+              AppLocalizations.of(context)!.clearCache,
               onTap: () {
                 //实现点击方法
               },
             ),
             _buildCard(
               context,
-              "模式选择",
+              AppLocalizations.of(context)!.darkMode,
               trailing: SizedBox(
                 height: 32,
                 child: Switch(
@@ -80,7 +81,7 @@ class _ConsumerStatefulWidget extends ConsumerState<ConsumerStatefulWidget>{
             ),
             _buildCard(
               context,
-              "当前版本",
+              AppLocalizations.of(context)!.currentVersion,
               onTap: () {
                 //实现点击方法
               },

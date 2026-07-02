@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_calendar/l10n/app_localizations.dart';
 import 'package:flutter_calendar/provider/shift_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_calendar/data/shift_pattern.dart';
@@ -24,7 +25,7 @@ class ShiftPatternPage extends ConsumerWidget {
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         title: Text(
-          "周期模式管理",
+          AppLocalizations.of(context)!.patternManagement,
           style: TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 16,
@@ -67,7 +68,7 @@ class ShiftPatternPage extends ConsumerWidget {
                   ),
                   const SizedBox(height: 12),
                   Text(
-                    "暂无模式配置，点击下方按钮添加",
+                    AppLocalizations.of(context)!.noPatternHint,
                     // 🚀 【优化 5】：空状态提示文字颜色深度柔和化
                     style: TextStyle(
                       color: isDark ? Colors.white38 : const Color(0xFF999999),
@@ -103,7 +104,7 @@ class ShiftPatternPage extends ConsumerWidget {
         },
         error: (error, _) => Center(
           child: Text(
-            "加载失败: $error",
+            "${AppLocalizations.of(context)!.loadErr} $error",
             // 🚀 【优化 6】：将刺眼的纯红换成在黑白底表现都极佳的柔和红
             style: const TextStyle(color: Colors.redAccent, fontWeight: FontWeight.w500),
           ),
@@ -114,7 +115,7 @@ class ShiftPatternPage extends ConsumerWidget {
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
-          print("老哥点击了添加班次周期模式");
+          //print("老哥点击了添加班次周期模式");
           showModalBottomSheet(
             context: context,
             isScrollControlled: true,
@@ -126,8 +127,8 @@ class ShiftPatternPage extends ConsumerWidget {
         elevation: 4,
         highlightElevation: 2,
         icon: const Icon(Icons.add, color: Colors.white, size: 20),
-        label: const Text(
-          "添加周期模式",
+        label:  Text(
+          AppLocalizations.of(context)!.addPattern,
           style: TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.bold,
@@ -167,7 +168,7 @@ class ShiftPatternPage extends ConsumerWidget {
         ? (isDark ? const Color(0xFFFF7875) : textRed)
         : (isDark ? const Color(0xFF597EF7) : textBlue);
 
-    final String tagText = isFixedWeekly ? "固定周" : "自定义";
+    final String tagText = isFixedWeekly ? AppLocalizations.of(context)!.weekPattern : AppLocalizations.of(context)!.custom;
 
     return Padding(
       key: ValueKey(pattern.id),
@@ -210,7 +211,7 @@ class ShiftPatternPage extends ConsumerWidget {
             ),
             child: InkWell(
               onTap: () {
-                print("老哥点击了模式卡片：${pattern.id}");
+                //print("老哥点击了模式卡片：${pattern.id}");
                 showModalBottomSheet(
                   context: context,
                   isScrollControlled: true,
@@ -337,7 +338,7 @@ class ShiftPatternPage extends ConsumerWidget {
     final configList = ref.read(shiftConfigViewModelProvider).value ?? <ShiftConfig>[];
 
     if (configList.isEmpty) {
-      print("警告：数据库中暂无具体班次配置，Spinner可能为空");
+      //print("警告：数据库中暂无具体班次配置，Spinner可能为空");
     }
 
     int? selectedMode;
@@ -423,9 +424,9 @@ class ShiftPatternPage extends ConsumerWidget {
                   children: [
                     Expanded(
                       child: SegmentedButton<int>(
-                        segments: const [
-                          ButtonSegment(value: 0, label: Text("周固定模式", style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold))),
-                          ButtonSegment(value: 1, label: Text("自定义模式", style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold))),
+                        segments:  [
+                          ButtonSegment(value: 0, label: Text(AppLocalizations.of(context)!.weekPattern, style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold))),
+                          ButtonSegment(value: 1, label: Text(AppLocalizations.of(context)!.custom, style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold))),
                         ],
                         selected: {selectedMode!},
                         showSelectedIcon: false,
@@ -448,7 +449,7 @@ class ShiftPatternPage extends ConsumerWidget {
 
                 // ==================== 第二行：条件联动内容区 ====================
                 if (selectedMode == 0) ...[
-                  Text("配置一周七天循环班次", style: TextStyle(color: isDark ? Colors.white38 : Colors.grey, fontSize: 12, fontWeight: FontWeight.bold)),
+                  Text(AppLocalizations.of(context)!.weekSetLabel, style: TextStyle(color: isDark ? Colors.white38 : Colors.grey, fontSize: 12, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 8),
                   SizedBox(
                     height: 120,
@@ -458,7 +459,14 @@ class ShiftPatternPage extends ConsumerWidget {
                       physics: const BouncingScrollPhysics(),
                       itemBuilder: (context, index) {
                         final weekDay = index + 1;
-                        final List<String> weekTitles = ["", "周一", "周二", "周三", "周四", "周五", "周六", "周日"];
+                        final List<String> weekTitles = ["",
+                          AppLocalizations.of(context)!.mon1,
+                          AppLocalizations.of(context)!.tue1,
+                          AppLocalizations.of(context)!.wed1,
+                          AppLocalizations.of(context)!.thu1,
+                          AppLocalizations.of(context)!.fri1,
+                          AppLocalizations.of(context)!.sat1,
+                          AppLocalizations.of(context)!.sun1];
                         return Container(
                           width: 90,
                           margin: const EdgeInsets.only(right: 8, bottom: 4),
@@ -501,7 +509,7 @@ class ShiftPatternPage extends ConsumerWidget {
                     ),
                   ),
                 ] else ...[
-                  Text("自由定义排班顺序（从左往右按顺序循环）", style: TextStyle(color: isDark ? Colors.white38 : Colors.grey, fontSize: 12, fontWeight: FontWeight.bold)),
+                  Text(AppLocalizations.of(context)!.customShiftLabel, style: TextStyle(color: isDark ? Colors.white38 : Colors.grey, fontSize: 12, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 8),
                   Wrap(
                     spacing: 8, runSpacing: 8,
@@ -512,7 +520,7 @@ class ShiftPatternPage extends ConsumerWidget {
                         final configId = entry.value;
                         final targetConfig = configList.where((e) => e.id == configId).firstOrNull;
                         return Chip(
-                          label: Text(targetConfig?.name ?? "未知班次", style: const TextStyle(fontSize: 12)),
+                          label: Text(targetConfig?.name ?? AppLocalizations.of(context)!.unknownShift, style: const TextStyle(fontSize: 12)),
                           // 🚀 【优化 5】：已添加的胶囊标签在夜间微调饱和度，防止对比过载
                           backgroundColor: isDark ? const Color(0xFF0052D9).withValues(alpha: 0.15) : const Color(0xFFE8F4FF),
                           labelStyle: TextStyle(color: isDark ? const Color(0xFF597EF7) : Colors.blue, fontWeight: FontWeight.bold),
@@ -534,7 +542,7 @@ class ShiftPatternPage extends ConsumerWidget {
                             children: [
                               Icon(Icons.add, size: 14, color: isDark ? Colors.white38 : Colors.grey),
                               const SizedBox(width: 4),
-                              Text("追加", style: TextStyle(fontSize: 12, color: isDark ? Colors.white38 : Colors.grey))
+                              Text(AppLocalizations.of(context)!.add, style: TextStyle(fontSize: 12, color: isDark ? Colors.white38 : Colors.grey))
                             ],
                           ),
                           dropdownColor: Theme.of(context).cardColor,
@@ -559,7 +567,7 @@ class ShiftPatternPage extends ConsumerWidget {
                 const SizedBox(height: 20),
 
                 // ==================== 第三行：固定日期区间选择 ====================
-                Text("生效日期范围", style: TextStyle(color: isDark ? Colors.white38 : Colors.grey, fontSize: 12, fontWeight: FontWeight.bold)),
+                Text(AppLocalizations.of(context)!.dateRange, style: TextStyle(color: isDark ? Colors.white38 : Colors.grey, fontSize: 12, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 8),
                 Row(
                   children: [
@@ -627,118 +635,32 @@ class ShiftPatternPage extends ConsumerWidget {
                     ),
                   ),
                 // ==================== 第四行：取消、删除、确定生成按钮 ====================
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                Column(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    if (pattern != null) ...[
-                      OutlinedButton(
-                        onPressed: () {
-                          print("老哥点击了删除/重置按钮");
-                          Navigator.pop(context);
-                          _confirmDelete(context, ref, pattern);
-                        },
-                        style: OutlinedButton.styleFrom(
-                          side: const BorderSide(color: Color(0xFFFA5151)),
-                          foregroundColor: const Color(0xFFFA5151),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-                        ),
-                        child: const Text("删除", style: TextStyle(fontWeight: FontWeight.bold)),
-                      ),
-                      const SizedBox(width: 8),
-                    ],
-                    Expanded(
-                      child: ElevatedButton(
-                        onPressed: () => Navigator.pop(context),
-                        style: ElevatedButton.styleFrom(
-                          // 🚀 【优化 6】：取消胶囊按钮大背景夜间收敛
-                          backgroundColor: cancelBtnBg,
-                          foregroundColor: isDark ? Colors.white60 : const Color(0xFF606266),
-                          elevation: 0,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                          padding: const EdgeInsets.symmetric(vertical: 12),
-                        ),
-                        child: const Text("取消", style: TextStyle(fontWeight: FontWeight.bold)),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      flex: 2,
+                    // 1️⃣ 上方：一键双发（最核心的主推荐操作，拉满）
+                    SizedBox(
+                      width: double.infinity,
                       child: ElevatedButton(
                         onPressed: () async {
-                          // ... 保持你的 notifier 核心生成业务逻辑不变
+                          // ... 保持你原本的【一键双发】核心业务逻辑不变
                           if (selectedMode == 0) {
                             await ref.read(shiftPatternViewModelProvider.notifier).changeShiftPattern(
-                                oldPattern: pattern,
-                                patternType: selectedMode!,
-                                startDate: formatStart,
-                                endDate: formatEnd,
+                                oldPattern: pattern, patternType: selectedMode!, startDate: formatStart, endDate: formatEnd,
                                 shiftConfigIds: weeklySelection!.values.toList().whereType<int>().toList());
-                            Navigator.pop(context);
-                          } else {
-                            if(customShiftIds == null || customShiftIds!.isEmpty){
-                              setModalState(() { isErrorMsg = true; });
-                              return;
-                            }
-                            await ref.read(shiftPatternViewModelProvider.notifier).changeShiftPattern(
-                                oldPattern: pattern,
-                                patternType: selectedMode!,
-                                startDate: formatStart,
-                                endDate: formatEnd,
-                                shiftConfigIds: customShiftIds!);
-                            Navigator.pop(context);
-                          }
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.blue,
-                          foregroundColor: Colors.white,
-                          elevation: 0,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                          padding: const EdgeInsets.symmetric(vertical: 12),
-                        ),
-                        child: const Text("模式生成", style: TextStyle(fontWeight: FontWeight.bold)),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      flex: 2,
-                      child: ElevatedButton(
-                        onPressed: () async {
-                          // ... 保持你的排班一键双发 notifier 生成业务逻辑不变
-                          if (selectedMode == 0) {
-                            await ref.read(shiftPatternViewModelProvider.notifier).changeShiftPattern(
-                                oldPattern: pattern,
-                                patternType: selectedMode!,
-                                startDate: formatStart,
-                                endDate: formatEnd,
-                                shiftConfigIds: weeklySelection!.values.toList().whereType<int>().toList());
-
                             final startDateTime = DateTime.parse(formatStart);
                             await ref.read(shiftViewModelProvider(startDateTime.year, startDateTime.month).notifier).generateShifts(
-                              startDate: formatStart,
-                              endDate: formatEnd,
-                              patternType: selectedMode!,
+                              startDate: formatStart, endDate: formatEnd, patternType: selectedMode!,
                               shiftConfigIds: weeklySelection!.values.toList().whereType<int>().toList(),
                             );
                             Navigator.pop(context);
                           } else {
-                            if(customShiftIds == null || customShiftIds!.isEmpty){
-                              setModalState(() { isErrorMsg = true; });
-                              return;
-                            }
+                            if(customShiftIds == null || customShiftIds!.isEmpty){ setModalState(() { isErrorMsg = true; }); return; }
                             await ref.read(shiftPatternViewModelProvider.notifier).changeShiftPattern(
-                                oldPattern: pattern,
-                                patternType: selectedMode!,
-                                startDate: formatStart,
-                                endDate: formatEnd,
-                                shiftConfigIds: customShiftIds!);
-
+                                oldPattern: pattern, patternType: selectedMode!, startDate: formatStart, endDate: formatEnd, shiftConfigIds: customShiftIds!);
                             final startDateTime = DateTime.parse(formatStart);
                             await ref.read(shiftViewModelProvider(startDateTime.year, startDateTime.month).notifier).generateShifts(
-                              startDate: formatStart,
-                              endDate: formatEnd,
-                              patternType: selectedMode!,
-                              shiftConfigIds: customShiftIds!,
+                              startDate: formatStart, endDate: formatEnd, patternType: selectedMode!, shiftConfigIds: customShiftIds!,
                             );
                             Navigator.pop(context);
                           }
@@ -748,10 +670,78 @@ class ShiftPatternPage extends ConsumerWidget {
                           foregroundColor: Colors.white,
                           elevation: 0,
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          padding: const EdgeInsets.symmetric(vertical: 14), // 加高一点更高级
                         ),
-                        child: const Text("排班生成", style: TextStyle(fontWeight: FontWeight.bold)),
+                        child: Text(AppLocalizations.of(context)!.generateShifts, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
                       ),
+                    ),
+                    const SizedBox(height: 10),
+
+                    // 2️⃣ 中间：仅生成规律
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: () async {
+                          // ... 保持你原本的【仅生成规律】核心业务逻辑不变
+                          if (selectedMode == 0) {
+                            await ref.read(shiftPatternViewModelProvider.notifier).changeShiftPattern(
+                                oldPattern: pattern, patternType: selectedMode!, startDate: formatStart, endDate: formatEnd,
+                                shiftConfigIds: weeklySelection!.values.toList().whereType<int>().toList());
+                            Navigator.pop(context);
+                          } else {
+                            if(customShiftIds == null || customShiftIds!.isEmpty){ setModalState(() { isErrorMsg = true; }); return; }
+                            await ref.read(shiftPatternViewModelProvider.notifier).changeShiftPattern(
+                                oldPattern: pattern, patternType: selectedMode!, startDate: formatStart, endDate: formatEnd, shiftConfigIds: customShiftIds!);
+                            Navigator.pop(context);
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.blue.withValues(alpha: 0.1), // 错开颜色层级
+                          foregroundColor: Colors.blue,
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                        ),
+                        child: Text(AppLocalizations.of(context)!.generatePattern, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+
+                    // 3️⃣ 底部：删除和取消（横向并排，不占纵向高度）
+                    Row(
+                      children: [
+                        if (pattern != null) ...[
+                          Expanded(
+                            child: OutlinedButton(
+                              onPressed: () {
+                                Navigator.pop(context);
+                                _confirmDelete(context, ref, pattern);
+                              },
+                              style: OutlinedButton.styleFrom(
+                                side: const BorderSide(color: Color(0xFFFA5151)),
+                                foregroundColor: const Color(0xFFFA5151),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                padding: const EdgeInsets.symmetric(vertical: 12),
+                              ),
+                              child: Text(AppLocalizations.of(context)!.delete, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                        ],
+                        Expanded(
+                          child: ElevatedButton(
+                            onPressed: () => Navigator.pop(context),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: cancelBtnBg,
+                              foregroundColor: isDark ? Colors.white60 : const Color(0xFF606266),
+                              elevation: 0,
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                              padding: const EdgeInsets.symmetric(vertical: 12),
+                            ),
+                            child: Text(AppLocalizations.of(context)!.cancel, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
@@ -772,12 +762,12 @@ class ShiftPatternPage extends ConsumerWidget {
       builder: (dialogContext) => AlertDialog(
         // 🚀 【优化 7】：自适应背景色
         backgroundColor: Theme.of(context).cardColor,
-        title: Text("确认删除", style: TextStyle(color: isDark ? Colors.white70 : Colors.black12)),
-        content: Text("确定要删除吗？", style: TextStyle(color: isDark ? Colors.white70 : Colors.black87)),
+        title: Text(AppLocalizations.of(context)!.confirmDel, style: TextStyle(color: isDark ? Colors.white70 : Colors.black87)),
+        content: Text(AppLocalizations.of(context)!.confirmDelHint, style: TextStyle(color: isDark ? Colors.white70 : Colors.black87)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: Text("算了", style: TextStyle(color: isDark ? Colors.white60 : Colors.grey)),
+            child: Text(AppLocalizations.of(context)!.cancel, style: TextStyle(color: isDark ? Colors.white60 : Colors.grey)),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
@@ -790,7 +780,7 @@ class ShiftPatternPage extends ConsumerWidget {
               Navigator.pop(dialogContext);
               await ref.read(shiftPatternViewModelProvider.notifier).deleteShiftPatternById(pattern.id);
             },
-            child: const Text("删除", style: TextStyle(fontWeight: FontWeight.bold)),
+            child:  Text(AppLocalizations.of(context)!.delete, style: TextStyle(fontWeight: FontWeight.bold)),
           ),
         ],
       ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_calendar/l10n/app_localizations.dart';
 import 'package:flutter_calendar/pages/shift_pattern_page.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_calendar/data/shift_config.dart';
@@ -61,7 +62,7 @@ class ShiftConfigPage extends ConsumerWidget {
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         title: Text(
-          "班次管理",
+          AppLocalizations.of(context)!.shiftManagement,
           style: TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 16,
@@ -77,7 +78,7 @@ class ShiftConfigPage extends ConsumerWidget {
                 ),
               );
             },
-            child: const Text("模式", style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.blue)),
+            child:  Text(AppLocalizations.of(context)!.pattern, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.blue)),
           ),
         ],
         backgroundColor: Theme.of(context).cardColor, // 🚀 顶栏自适应
@@ -136,8 +137,8 @@ class ShiftConfigPage extends ConsumerWidget {
         },
         backgroundColor: Colors.blue,
         icon: const Icon(Icons.add, color: Colors.white),
-        label: const Text(
-          "添加班次",
+        label: Text(
+          AppLocalizations.of(context)!.addShift,
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
       ),

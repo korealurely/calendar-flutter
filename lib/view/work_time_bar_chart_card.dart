@@ -2,6 +2,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter_calendar/data/work_time_stat.dart';
+import 'package:flutter_calendar/l10n/app_localizations.dart';
 
 class WorkTimeBarChartCard extends StatefulWidget {
   final List<WorkTimeStat> dataList;
@@ -60,7 +61,7 @@ class _WorkTimeBarChartCard extends State<WorkTimeBarChartCard> {
             children: [
               Expanded(
                 child: Text(
-                  "工时统计",
+                  AppLocalizations.of(context)!.workTimeStat,
                   maxLines: 1,
                   style: TextStyle(
                     fontSize: 16,
@@ -92,7 +93,7 @@ class _WorkTimeBarChartCard extends State<WorkTimeBarChartCard> {
                   ),
                   const SizedBox(width: 8),
                   Text(
-                    monthStr,
+                    AppLocalizations.of(context)!.yearMonthDate(widget.currentMonth),
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.bold,
@@ -190,7 +191,7 @@ class _WorkTimeBarChartCard extends State<WorkTimeBarChartCard> {
                         tooltipMargin: 4,
                         getTooltipItem: (group, groupIndex, rod, rodIndex) {
                           return BarTooltipItem(
-                            '${rod.toY.toStringAsFixed(1)}小时',
+                            '${rod.toY.toStringAsFixed(1)}${AppLocalizations.of(context)!.hour}',
                             const TextStyle(
                               color: Colors.white,
                               fontWeight: FontWeight.bold,
@@ -247,7 +248,7 @@ class _WorkTimeBarChartCard extends State<WorkTimeBarChartCard> {
                               return Padding(
                                 padding: const EdgeInsets.only(top: 8.0),
                                 child: Text(
-                                  '$day日',
+                                  '$day${AppLocalizations.of(context)!.day1}',
                                   style: TextStyle(
                                     // 🚀 【优化 6】：X轴日期刻度文字自适应
                                     color: isDark ? Colors.white38 : Colors.black38,
@@ -313,14 +314,14 @@ class _WorkTimeBarChartCard extends State<WorkTimeBarChartCard> {
           Icon(Icons.error_outline_rounded, size: 40, color: Colors.redAccent.withValues(alpha: 0.6)),
           const SizedBox(height: 8),
           Text(
-            widget.errMsg ?? "工时统计加载失败",
+            widget.errMsg ?? AppLocalizations.of(context)!.workStatError,
             style: TextStyle(fontSize: 12, color: isDark ? Colors.white38 : Colors.black38),
           ),
           const SizedBox(height: 12),
           ElevatedButton.icon(
             onPressed: widget.onRetry,
             icon: const Icon(Icons.refresh_rounded, size: 14),
-            label: const Text("重新加载", style: TextStyle(fontSize: 12)),
+            label:  Text(AppLocalizations.of(context)!.reload, style: TextStyle(fontSize: 12)),
             style: ElevatedButton.styleFrom(
               // 🚀 【优化 8】：重试按钮夜间降噪
               backgroundColor: isDark ? Colors.white.withValues(alpha: 0.06) : const Color(0xFFF5F7FA),
@@ -346,7 +347,7 @@ class _WorkTimeBarChartCard extends State<WorkTimeBarChartCard> {
           Icon(Icons.bar_chart_rounded, size: 48, color: isDark ? Colors.white12 : Colors.grey.withValues(alpha: 0.3)),
           const SizedBox(height: 12),
           Text(
-            "本月还没有登记工时数据哦~",
+            AppLocalizations.of(context)!.workStatHint,
             style: TextStyle(
               fontSize: 13,
               color: isDark ? Colors.white38 : Colors.grey,

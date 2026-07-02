@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter_calendar/data/shift_stat_item.dart';
+import 'package:flutter_calendar/l10n/app_localizations.dart';
 
 class ShiftPieChartCard extends StatefulWidget {
   final List<ShiftStatItem> statList;
@@ -67,7 +68,7 @@ class _ShiftPieChartCard extends State<ShiftPieChartCard> {
             children: [
               Expanded(
                 child: Text(
-                  "班次统计",
+                  AppLocalizations.of(context)!.shiftStatistic,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
@@ -96,7 +97,7 @@ class _ShiftPieChartCard extends State<ShiftPieChartCard> {
                   ),
                   const SizedBox(width: 8),
                   Text(
-                    monthStr,
+                    AppLocalizations.of(context)!.yearMonthDate(widget.currentMonth),
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.bold,
@@ -156,7 +157,7 @@ class _ShiftPieChartCard extends State<ShiftPieChartCard> {
           Icon(Icons.error_outline_rounded, size: 40, color: Colors.redAccent.withValues(alpha: 0.6)),
           const SizedBox(height: 8),
           Text(
-            widget.errorMsg ?? "数据对账有些小失败",
+            widget.errorMsg ?? AppLocalizations.of(context)!.staticErrorHint,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: TextStyle(fontSize: 12, color: isDark ? Colors.white38 : Colors.black38),
@@ -165,7 +166,7 @@ class _ShiftPieChartCard extends State<ShiftPieChartCard> {
           ElevatedButton.icon(
             onPressed: widget.onRetry,
             icon: const Icon(Icons.refresh_rounded, size: 14),
-            label: const Text("重新加载", style: TextStyle(fontSize: 12)),
+            label:  Text(AppLocalizations.of(context)!.reload, style: TextStyle(fontSize: 12)),
             style: ElevatedButton.styleFrom(
               // 🚀 【优化 4】：重试按钮底色完美降噪（暗黑下用白透明遮罩形成轻质灰色，不刺眼）
               backgroundColor: isDark ? Colors.white.withValues(alpha: 0.06) : const Color(0xFFF5F7FA),
@@ -196,7 +197,7 @@ class _ShiftPieChartCard extends State<ShiftPieChartCard> {
           ),
           const SizedBox(height: 12),
           Text(
-            "本月暂无排班统计数据哦~",
+            AppLocalizations.of(context)!.noShiftStatHint,
             style: TextStyle(fontSize: 13, color: isDark ? Colors.white38 : Colors.grey, fontWeight: FontWeight.w400),
           ),
         ],
@@ -229,7 +230,7 @@ class _ShiftPieChartCard extends State<ShiftPieChartCard> {
                       ),
                     ),
                     Text(
-                        "总天数",
+                        AppLocalizations.of(context)!.totalDays,
                         style: TextStyle(fontSize: 11, color: isDark ? Colors.white38 : Colors.grey)
                     ),
                   ],
@@ -281,7 +282,7 @@ class _ShiftPieChartCard extends State<ShiftPieChartCard> {
       return PieChartSectionData(
         color: Color(item.colorValue),
         value: item.count.toDouble(),
-        title: '${item.count}天',
+        title: '${item.count}${AppLocalizations.of(context)!.day}',
         radius: radius,
         titleStyle: TextStyle(
           fontSize: isTouched ? 14 : 11,

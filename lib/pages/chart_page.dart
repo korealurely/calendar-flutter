@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_calendar/l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_calendar/view/shift_pie_chart_card.dart';
 import 'package:flutter_calendar/view/weight_line_chart_card.dart';
@@ -31,7 +32,7 @@ class _ChartPage extends ConsumerState<ChartPage> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    //final isDark = Theme.of(context).brightness == Brightness.dark;
 
     // 🎯 精准拦截 Tab 切换：人肉砸碎缓存重捞
     ref.listen<int>(mainTabIndexProvider, (previous, next) {
@@ -59,7 +60,7 @@ class _ChartPage extends ConsumerState<ChartPage> {
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         title: Text(
-          "数据统计",
+          AppLocalizations.of(context)!.dataStatistic,
           style: TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 16,

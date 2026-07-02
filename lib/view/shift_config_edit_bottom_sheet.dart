@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_calendar/l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:flutter_calendar/data/shift_config.dart';
@@ -50,8 +51,8 @@ class _ShiftConfigEditBottomSheetState extends ConsumerState<ShiftConfigEditBott
         // 🚀 【优化 1】：取色弹窗底色全自动感应暗黑
         backgroundColor: Theme.of(context).cardColor,
         title: Text(
-          "选择班次颜色",
-          style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color, fontWeight: FontWeight.bold),
+          AppLocalizations.of(context)!.setShiftColor,
+          style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color, fontWeight: FontWeight.bold,fontSize: 16),
         ),
         content: SingleChildScrollView(
           child: ColorPicker(
@@ -65,11 +66,11 @@ class _ShiftConfigEditBottomSheetState extends ConsumerState<ShiftConfigEditBott
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text("取消", style: TextStyle(color: isDark ? Colors.white38 : Colors.grey)),
+            child: Text(AppLocalizations.of(context)!.cancel, style: TextStyle(color: isDark ? Colors.white38 : Colors.grey)),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: Colors.blue, elevation: 0),
-            child: const Text("选定", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+            child:  Text(AppLocalizations.of(context)!.confirm, style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
             onPressed: () {
               setState(() {
                 _selectedColorValue = pickedColor.toARGB32();
@@ -111,7 +112,7 @@ class _ShiftConfigEditBottomSheetState extends ConsumerState<ShiftConfigEditBott
               ),
             ),
             Text(
-              _isEditMode ? "修改班次" : "添加班次",
+              _isEditMode ? AppLocalizations.of(context)!.editShift : AppLocalizations.of(context)!.addShift,
               style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -125,7 +126,7 @@ class _ShiftConfigEditBottomSheetState extends ConsumerState<ShiftConfigEditBott
               controller: _nameController,
               style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color),
               decoration: InputDecoration(
-                labelText: '班次名称（如: 早班）',
+                labelText: AppLocalizations.of(context)!.shiftNameHint,
                 labelStyle: TextStyle(color: isDark ? Colors.white38 : Colors.black45),
                 border: const OutlineInputBorder(),
                 focusedBorder: const OutlineInputBorder(borderSide: BorderSide(color: Colors.blue, width: 2)),
@@ -138,7 +139,7 @@ class _ShiftConfigEditBottomSheetState extends ConsumerState<ShiftConfigEditBott
               maxLength: 2,
               style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color),
               decoration: InputDecoration(
-                labelText: '日历格子标签（如: 早）',
+                labelText: AppLocalizations.of(context)!.shiftLabelHint,
                 labelStyle: TextStyle(color: isDark ? Colors.white38 : Colors.black45),
                 border: const OutlineInputBorder(),
                 counterText: "",
@@ -163,12 +164,12 @@ class _ShiftConfigEditBottomSheetState extends ConsumerState<ShiftConfigEditBott
                       }
                     },
                     icon: Icon(Icons.access_time, size: 14, color: isDark ? Colors.white60 : Colors.black54),
-                    label: Text(_startTime ?? "上班时间", style: TextStyle(color: isDark ? Colors.white70 : Colors.black87)),
+                    label: Text(_startTime ?? AppLocalizations.of(context)!.startShift, style: TextStyle(color: isDark ? Colors.white70 : Colors.black87)),
                   ),
                 ),
                 Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 10),
-                    child: Text("至", style: TextStyle(color: isDark ? Colors.white60 : Colors.black54))
+                    child: Text(AppLocalizations.of(context)!.to, style: TextStyle(color: isDark ? Colors.white60 : Colors.black54))
                 ),
                 Expanded(
                   child: OutlinedButton.icon(
@@ -184,14 +185,14 @@ class _ShiftConfigEditBottomSheetState extends ConsumerState<ShiftConfigEditBott
                       }
                     },
                     icon: Icon(Icons.access_time, size: 14, color: isDark ? Colors.white60 : Colors.black54),
-                    label: Text(_endTime ?? "下班时间", style: TextStyle(color: isDark ? Colors.white70 : Colors.black87)),
+                    label: Text(_endTime ?? AppLocalizations.of(context)!.endWork, style: TextStyle(color: isDark ? Colors.white70 : Colors.black87)),
                   ),
                 ),
               ],
             ),
 
             const SizedBox(height: 20),
-            Text("专属颜色", style: TextStyle(color: isDark ? Colors.white54 : Colors.black54, fontSize: 14)),
+            Text(AppLocalizations.of(context)!.customColor, style: TextStyle(color: isDark ? Colors.white54 : Colors.black54, fontSize: 14)),
             const SizedBox(height: 10),
             Row(
               children: [
@@ -214,7 +215,7 @@ class _ShiftConfigEditBottomSheetState extends ConsumerState<ShiftConfigEditBott
                   ),
                 ),
                 const SizedBox(width: 14),
-                Text("点击设定颜色", style: TextStyle(color: isDark ? Colors.white38 : Colors.black38, fontSize: 13))
+                Text(AppLocalizations.of(context)!.setColor, style: TextStyle(color: isDark ? Colors.white38 : Colors.black38, fontSize: 13))
               ],
             ),
             const SizedBox(height: 32),
@@ -237,13 +238,13 @@ class _ShiftConfigEditBottomSheetState extends ConsumerState<ShiftConfigEditBott
                       if (context.mounted) Navigator.pop(context);
                     },
                     icon: const Icon(Icons.delete_outline, color: Color(0xFFFF5252)),
-                    label: const Text("删除", style: TextStyle(color: Color(0xFFFF5252), fontWeight: FontWeight.bold)),
+                    label:  Text(AppLocalizations.of(context)!.delete, style: TextStyle(color: Color(0xFFFF5252), fontWeight: FontWeight.bold)),
                   ),
                 const Spacer(),
 
                 TextButton(
                   onPressed: () => Navigator.pop(context),
-                  child: Text("取消", style: TextStyle(color: isDark ? Colors.white38 : Colors.grey)),
+                  child: Text(AppLocalizations.of(context)!.cancel, style: TextStyle(color: isDark ? Colors.white38 : Colors.grey)),
                 ),
                 const SizedBox(width: 12),
 
@@ -258,7 +259,7 @@ class _ShiftConfigEditBottomSheetState extends ConsumerState<ShiftConfigEditBott
                     if (_nameController.text.isEmpty || _labelController.text.isEmpty) {
                       HapticFeedback.vibrate();
                       setState(() {
-                        _errorMessage = "⚠️ 请完整填写班次名称和标签！";
+                        _errorMessage = "⚠️ ${AppLocalizations.of(context)!.shiftErrMsg}";
                       });
                       return;
                     }
@@ -284,7 +285,7 @@ class _ShiftConfigEditBottomSheetState extends ConsumerState<ShiftConfigEditBott
                     }
                     if (context.mounted) Navigator.pop(context);
                   },
-                  child: const Text("确认提交", style: TextStyle(fontWeight: FontWeight.bold)),
+                  child:  Text(AppLocalizations.of(context)!.confirm, style: TextStyle(fontWeight: FontWeight.bold)),
                 )
               ],
             )

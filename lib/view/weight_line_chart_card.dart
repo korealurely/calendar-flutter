@@ -2,6 +2,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter_calendar/data/weight_stat_item.dart';
+import 'package:flutter_calendar/l10n/app_localizations.dart';
 
 class WeightLineChartCard extends StatefulWidget{
   final List<WeightStatItem> dataList;
@@ -52,7 +53,7 @@ class _WeightLineChartCard extends State<WeightLineChartCard>{
             children: [
               Expanded(
                 child: Text(
-                  "体重趋势",
+                  AppLocalizations.of(context)!.weightStat,
                   maxLines: 1,
                   style: TextStyle(
                     fontSize: 16,
@@ -76,7 +77,7 @@ class _WeightLineChartCard extends State<WeightLineChartCard>{
                   ),
                   const SizedBox(width: 8),
                   Text(
-                    dateStr,
+                    AppLocalizations.of(context)!.yearMonthDate(widget.currentMonth),
                     style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.bold,
@@ -236,7 +237,7 @@ class _WeightLineChartCard extends State<WeightLineChartCard>{
                       return Padding(
                         padding: const EdgeInsets.only(top: 8.0),
                         child: Text(
-                            '$day日',
+                            '$day${AppLocalizations.of(context)!.day1}',
                             // 🚀 【优化 7】：X 轴日期文字自适应
                             style: TextStyle(color: isDark ? Colors.white38 : Colors.black38, fontSize: 10)
                         ),
@@ -296,11 +297,11 @@ class _WeightLineChartCard extends State<WeightLineChartCard>{
         children: [
           Icon(Icons.error_outline_rounded, size: 40, color: Colors.redAccent.withValues(alpha: 0.6)),
           const SizedBox(height: 8),
-          Text(widget.errorMsg ?? "体重曲线绘制失败", style: TextStyle(fontSize: 11, color: isDark ? Colors.white38 : Colors.black38)),
+          Text(widget.errorMsg ?? AppLocalizations.of(context)!.weightStatError, style: TextStyle(fontSize: 11, color: isDark ? Colors.white38 : Colors.black38)),
           const SizedBox(height: 12),
           ElevatedButton.icon(
               icon: const Icon(Icons.refresh_rounded, size: 14),
-              label: const Text("重新加载", style: TextStyle(fontSize: 12)),
+              label:  Text(AppLocalizations.of(context)!.reload, style: TextStyle(fontSize: 12)),
               onPressed: widget.onRetry,
               style: ElevatedButton.styleFrom(
                 // 🚀 【优化 10】：重试按钮底色完美适配
@@ -327,7 +328,7 @@ class _WeightLineChartCard extends State<WeightLineChartCard>{
           Icon(Icons.show_chart_rounded, size: 40, color: isDark ? Colors.white12 : Colors.grey.withValues(alpha: 0.3)),
           const SizedBox(height: 12),
           Text(
-            "本月还没有记录体重数据",
+            AppLocalizations.of(context)!.weightStatHint,
             style: TextStyle(fontSize: 13, color: isDark ? Colors.white38 : Colors.grey, fontWeight: FontWeight.w400),
           ),
         ],
