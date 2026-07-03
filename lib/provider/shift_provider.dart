@@ -2,12 +2,14 @@ import 'package:flutter_calendar/data/calendar_weight.dart';
 import 'package:flutter_calendar/data/shift_config.dart';
 import 'package:flutter_calendar/data/shift_pattern.dart';
 import 'package:flutter_calendar/provider/shift_config_provider.dart';
+import 'package:flutter_calendar/provider/weight_provider.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:isar/isar.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter_calendar/data/calendar_shift.dart';
 import 'package:flutter_calendar/repository/shift_repository.dart';
 import 'package:flutter_calendar/provider/month_chart_provider.dart';
+
 
 // 💥 依然雷打不动，让外挂继续生成后门
 part 'shift_provider.g.dart';
@@ -98,6 +100,8 @@ class ShiftViewModel extends _$ShiftViewModel {
     // 既省电、又100%安全，绝不堵车！
     ref.invalidateSelf(); // 叫自己（日历）重捞
     ref.invalidate(monthlyShiftChartProvider); // 叫隔壁（图表）顺便重捞
+    //ref.invalidate(monthlyWeightChartProvider);
+    ref.invalidate(monthlyWorkTimeStatsProvider);
   }
 
   /// 💾 批量生成排班
@@ -157,6 +161,8 @@ class ShiftViewModel extends _$ShiftViewModel {
     // 🚀【主动国防线】：批量入库成功，通杀重刷！
     ref.invalidateSelf();
     ref.invalidate(monthlyShiftChartProvider);
+    //ref.invalidate(monthlyWeightChartProvider);
+    ref.invalidate(monthlyWorkTimeStatsProvider);
   }
 
   /// 💾 删除排班
@@ -167,6 +173,8 @@ class ShiftViewModel extends _$ShiftViewModel {
     // 🚀【主动国防线】：删除成功，通杀重刷！
     ref.invalidateSelf();
     ref.invalidate(monthlyShiftChartProvider);
+    //ref.invalidate(monthlyWeightChartProvider);
+    ref.invalidate(monthlyWorkTimeStatsProvider);
   }
 
   Map<int, ShiftConfig> _getCurrentConfigMap() {
@@ -175,5 +183,18 @@ class ShiftViewModel extends _$ShiftViewModel {
       data: (list) => {for (var config in list) config.id: config},
       orElse: () => {},
     );
+  }
+
+  Future<void> clearCache() async{
+    await ref.read(shiftRepositoryProvider).clearAll();
+
+    // 2. 顺手把兄弟们和自己一起枪毙，通知全网刷新空状态
+    //ref.invalidate(shiftPatternViewModelProvider);
+    ref.invalidate(shiftConfigViewModelProvider);
+    ref.invalidate(weightViewModelProvider);
+    ref.invalidateSelf(); // 重置自己
+    ref.invalidate(monthlyShiftChartProvider);
+    ref.invalidate(monthlyWeightChartProvider);
+    ref.invalidate(monthlyWorkTimeStatsProvider);
   }
 }

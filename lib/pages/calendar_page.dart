@@ -636,6 +636,11 @@ class _CalendarPageState extends ConsumerState<CalendarPage> {
 
   void _showShiftEditBottomSheet(BuildContext context, DateTime date, CalendarShift? currentShift) {
     int? selectedConfigId = currentShift?.shiftConfigId;
+    ShiftConfig? currentConfig = currentShift?.config;
+
+    // 3. 动态计算格式化后的日期文本（时刻盯着内存里的局部变量）
+    final String formatDate = "${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
+
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     showModalBottomSheet(
@@ -714,6 +719,7 @@ class _CalendarPageState extends ConsumerState<CalendarPage> {
                                   if (selected) {
                                     setPopupState(() {
                                       selectedConfigId = null;
+                                      currentConfig = null;
                                     });
                                   }
                                 },
@@ -735,6 +741,7 @@ class _CalendarPageState extends ConsumerState<CalendarPage> {
                                     if (selected) {
                                       setPopupState(() {
                                         selectedConfigId = config.id;
+                                        currentConfig = config;
                                       });
                                     }
                                   },
@@ -759,9 +766,26 @@ class _CalendarPageState extends ConsumerState<CalendarPage> {
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                             elevation: 0,
                           ),
-                          onPressed: () {
+                          onPressed: () async{
                             // TODO: 结合你原本的 ViewModel 去执行保存
                             Navigator.pop(context);
+
+                            // 2. 拿着最终选好的 selectedConfigId 去敲 Isar 数据库的大门
+                            if (selectedConfigId == null) {
+                              // 🛑 如果最后选的是清除/休息，执行物理删除
+                              final dateId = date.year * 10000 + date.month * 100 + date.day;
+                              await ref.read(shiftViewModelProvider(date.year, date.month).notifier).deleteShiftById(dateId);
+                            } else {
+                              // 💾 否则，直接保存选中的班次 ID
+                              await ref.read(shiftViewModelProvider(date.year, date.month).notifier).changeDayShift(
+                                year: date.year,
+                                month: date.month,
+                                day: date.day,
+                                shiftId: selectedConfigId, // 最终确定的班次
+                                isAlarm: false,
+                                alarmTime: currentConfig != null && currentConfig?.startTime!= null ? DateTime.parse("$formatDate ${currentConfig?.startTime}") : null, // 纯改班次，时间走配置里的默认值，不覆盖
+                              );
+                            }
                           },
                           child: Text(AppLocalizations.of(context)!.confirm, style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                         ),

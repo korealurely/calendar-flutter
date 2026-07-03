@@ -1,0 +1,111 @@
+{
+  "@@locale": "ja",
+  "myPageTitle": "マイページ",
+  "clearCache": "キャッシュをクリア",
+  "darkMode": "ダークモード",
+  "currentVersion": "現在のバージョン",
+  "homePage": "ホーム",
+  "shift": "シフト",
+  "statistic": "統計",
+  "my": "マイページ",
+  "yearMonthDate": "{date}",
+  "@yearMonthDate": {
+    "placeholders": {
+      "date": {
+        "type": "DateTime",
+        "format": "yMMMM"
+      }
+    }
+  },
+  "monthDayDate": "{date}",
+  "@monthDayDate": {
+    "placeholders": {
+      "date": {
+        "type": "DateTime",
+        "format": "MMMMd"
+      }
+    }
+  },
+  "mon": "月",
+  "tue": "火",
+  "wed": "水",
+  "thu": "木",
+  "fri": "金",
+  "sat": "土",
+  "sun": "日",
+  "detail": "詳細",
+  "noShift": "シフトなし",
+  "noShiftHint": "今日はシフトがありません。ゆっくり休みましょう～",
+  "startShift": "出勤時間",
+  "endWork": "退勤時間",
+  "editShift": "シフト編集",
+  "selectShiftType": "シフトタイプを選択",
+  "clearShift": "クリア／休み",
+  "confirm": "確定",
+  "loadErr": "読み込み失敗:",
+  "weight": "体重",
+  "noData": "データなし",
+  "noWeightHint": "今日はまだ体重を記録していません。クリックして記録しましょう～",
+  "shiftManagement": "シフト管理",
+  "pattern": "パターン",
+  "addShift": "シフト追加",
+  "shiftNameHint": "シフト名（例：早番）",
+  "shiftLabelHint": "カレンダーラベル（例：早）",
+  "to": "から",
+  "customColor": "専用カラー",
+  "setColor": "クリックしてカラーを設定",
+  "delete": "削除",
+  "cancel": "キャンセル",
+  "shiftErrMsg": "シフト名とラベルをすべて入力してください！",
+  "setShiftColor": "シフトカラーを選択",
+  "patternManagement": "周期パターン管理",
+  "noPatternHint": "パターンがありません。下のボタンから追加してください",
+  "addPattern": "周期パターン追加",
+  "weekPattern": "固定週",
+  "custom": "カスタム",
+  "confirmDel": "削除を確定",
+  "confirmDelHint": "本当に削除しますか？",
+  "generateShifts": "シフト生成",
+  "generatePattern": "パターン生成",
+  "weekSetLabel": "1週間7日間のシフトを設定",
+  "mon1": "月曜日",
+  "tue1": "火曜日",
+  "wed1": "水曜日",
+  "thu1": "木曜日",
+  "fri1": "金曜日",
+  "sat1": "土曜日",
+  "sun1": "日曜日",
+  "customShiftLabel": "シフト順序を自由に設定（左から右へ順番にループ）",
+  "unknownShift": "不明なシフト",
+  "add": "追加",
+  "dateRange": "有効日範囲",
+  "dataStatistic": "データ統計",
+  "shiftStatistic": "シフト統計",
+  "staticErrorHint": "データ照合に一部失敗しました",
+  "reload": "再読み込み",
+  "noShiftStatHint": "今月はシフト統計データがありません～",
+  "totalDays": "合計日数",
+  "day": "日",
+  "weightStat": "体重推移",
+  "day1": "日",
+  "weightStatError": "体重グラフの描画に失敗しました",
+  "weightStatHint": "今月はまだ体重データが記録されていません",
+  "workTimeStat": "勤務時間統計",
+  "hour": "時間",
+  "workStatError": "勤務時間統計の読み込みに失敗しました",
+  "workStatHint": "今月はまだ勤務時間データが登録されていません～",
+  "language": "言語",
+  "noShiftConfigHint": "シフト設定がありません。右下の「＋」から追加してください",
+  "deleteConfigConfirmContent": "【{configName}】を本当に削除しますか？",
+  "@deleteConfigConfirmContent": {
+    "placeholders": {
+      "configName": {
+        "type": "String"
+      }
+    }
+  },
+  "clearHint": "すべてのデータを本当にクリアしますか？",
+  "midShift": "中番",
+  "pmShift": "夜勤",
+  "amShift": "早番"
+}

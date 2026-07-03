@@ -596,7 +596,7 @@ class ShiftPatternPage extends ConsumerWidget {
                         ),
                       ),
                     ),
-                    Padding(padding: const EdgeInsets.symmetric(horizontal: 8), child: Text("至", style: TextStyle(color: isDark ? Colors.white38 : Colors.grey))),
+                    Padding(padding: const EdgeInsets.symmetric(horizontal: 8), child: Text(AppLocalizations.of(context)!.to, style: TextStyle(color: isDark ? Colors.white38 : Colors.grey))),
                     Expanded(
                       child: InkWell(
                         onTap: () async {

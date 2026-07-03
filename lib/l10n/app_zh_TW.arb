@@ -93,5 +93,19 @@
   "workTimeStat": "工時統計",
   "hour": "小時",
   "workStatError": "工時統計加載失敗",
-  "workStatHint": "本月還沒有登記工時資料哦~"
+  "workStatHint": "本月還沒有登記工時資料哦~",
+  "language": "語言",
+  "noShiftConfigHint": "暫無班次配置，點擊右下角+新增",
+  "deleteConfigConfirmContent": "確定要刪除【{configName}】嗎？",
+  "@deleteConfigConfirmContent": {
+    "placeholders": {
+      "configName": {
+        "type": "String"
+      }
+    }
+  },
+  "clearHint": "確定要清空所有資料嗎？",
+  "midShift": "中班",
+  "pmShift": "夜班",
+  "amShift": "早班"
 }

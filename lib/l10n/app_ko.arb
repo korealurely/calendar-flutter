@@ -1,0 +1,111 @@
+{
+  "@@locale": "ko",
+  "myPageTitle": "내 정보",
+  "clearCache": "캐시 삭제",
+  "darkMode": "다크 모드",
+  "currentVersion": "현재 버전",
+  "homePage": "홈",
+  "shift": "근무표",
+  "statistic": "통계",
+  "my": "내 정보",
+  "yearMonthDate": "{date}",
+  "@yearMonthDate": {
+    "placeholders": {
+      "date": {
+        "type": "DateTime",
+        "format": "yMMMM"
+      }
+    }
+  },
+  "monthDayDate": "{date}",
+  "@monthDayDate": {
+    "placeholders": {
+      "date": {
+        "type": "DateTime",
+        "format": "MMMMd"
+      }
+    }
+  },
+  "mon": "월",
+  "tue": "화",
+  "wed": "수",
+  "thu": "목",
+  "fri": "금",
+  "sat": "토",
+  "sun": "일",
+  "detail": "상세",
+  "noShift": "근무표 없음",
+  "noShiftHint": "오늘은 근무 일정이 없습니다. 푹 쉬세요~",
+  "startShift": "출근 시간",
+  "endWork": "퇴근 시간",
+  "editShift": "근무표 수정",
+  "selectShiftType": "근무 유형 선택",
+  "clearShift": "비움/휴식",
+  "confirm": "확인",
+  "loadErr": "불러오기 실패:",
+  "weight": "체중",
+  "noData": "데이터 없음",
+  "noWeightHint": "오늘은 아직 체중을 기록하지 않았어요. 클릭해서 기록해보세요~",
+  "shiftManagement": "근무표 관리",
+  "pattern": "패턴",
+  "addShift": "근무표 추가",
+  "shiftNameHint": "근무표 이름 (예: 오전근무)",
+  "shiftLabelHint": "달력 칸 라벨 (예: 오)",
+  "to": "~",
+  "customColor": "전용 색상",
+  "setColor": "클릭하여 색상 설정",
+  "delete": "삭제",
+  "cancel": "취소",
+  "shiftErrMsg": "근무표 이름과 라벨을 모두 입력해주세요!",
+  "setShiftColor": "근무표 색상 선택",
+  "patternManagement": "주기 패턴 관리",
+  "noPatternHint": "패턴 설정이 없습니다. 아래 버튼을 클릭하여 추가하세요.",
+  "addPattern": "주기 패턴 추가",
+  "weekPattern": "고정 주",
+  "custom": "사용자 정의",
+  "confirmDel": "삭제 확인",
+  "confirmDelHint": "정말 삭제하시겠습니까?",
+  "generateShifts": "근무표 생성",
+  "generatePattern": "패턴 생성",
+  "weekSetLabel": "일주일 7일 순환 근무표 설정",
+  "mon1": "월요일",
+  "tue1": "화요일",
+  "wed1": "수요일",
+  "thu1": "목요일",
+  "fri1": "금요일",
+  "sat1": "토요일",
+  "sun1": "일요일",
+  "customShiftLabel": "근무 순서 자유 정의 (왼쪽에서 오른쪽 순서대로 순환)",
+  "unknownShift": "알 수 없는 근무표",
+  "add": "추가",
+  "dateRange": "적용 기간",
+  "dataStatistic": "데이터 통계",
+  "shiftStatistic": "근무표 통계",
+  "staticErrorHint": "데이터 정산에 약간의 오류가 있습니다.",
+  "reload": "다시 불러오기",
+  "noShiftStatHint": "이번 달에는 근무표 통계 데이터가 없습니다~",
+  "totalDays": "총 일수",
+  "day": "일",
+  "weightStat": "체중 추세",
+  "day1": "일",
+  "weightStatError": "체중 그래프 그리기 실패",
+  "weightStatHint": "이번 달에는 아직 체중 데이터가 없습니다.",
+  "workTimeStat": "근무 시간 통계",
+  "hour": "시간",
+  "workStatError": "근무 시간 통계 불러오기 실패",
+  "workStatHint": "이번 달에는 아직 근무 시간 데이터가 없습니다~",
+  "language": "언어",
+  "noShiftConfigHint": "근무표 설정이 없습니다. 오른쪽 아래 +를 클릭하여 추가하세요.",
+  "deleteConfigConfirmContent": "정말로 【{configName}】을(를) 삭제하시겠습니까?",
+  "@deleteConfigConfirmContent": {
+    "placeholders": {
+      "configName": {
+        "type": "String"
+      }
+    }
+  },
+  "clearHint": "정말 모든 데이터를 삭제하시겠습니까?",
+  "midShift": "중간 근무",
+  "pmShift": "야간 근무",
+  "amShift": "오전 근무"
+}

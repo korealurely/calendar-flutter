@@ -22,17 +22,17 @@ class ShiftConfigPage extends ConsumerWidget {
         // 自动读取暗黑下的卡片底色，不亮瞎眼
         backgroundColor: Theme.of(context).cardColor,
         title: Text(
-            "确认删除",
+            AppLocalizations.of(context)!.confirmDel,
             style: TextStyle(fontWeight: FontWeight.bold, color: Theme.of(context).textTheme.bodyLarge?.color)
         ),
         content: Text(
-          "确定要删除【${config.name}】吗？",
+          AppLocalizations.of(context)!.deleteConfigConfirmContent(config.name),
           style: TextStyle(color: isDark ? Colors.white70 : Colors.black87),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: Text("算了", style: TextStyle(color: isDark ? Colors.white38 : Colors.grey)),
+            child: Text(AppLocalizations.of(context)!.cancel, style: TextStyle(color: isDark ? Colors.white38 : Colors.grey)),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
@@ -45,7 +45,7 @@ class ShiftConfigPage extends ConsumerWidget {
                   .read(shiftConfigViewModelProvider.notifier)
                   .deleteConfigById(config.id);
             },
-            child: const Text("删除", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+            child: Text(AppLocalizations.of(context)!.delete, style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
           ),
         ],
       ),
@@ -92,7 +92,7 @@ class ShiftConfigPage extends ConsumerWidget {
           if (dbList.isEmpty) {
             return Center(
               child: Text(
-                "暂无班次配置，点击右下角+添加",
+                AppLocalizations.of(context)!.noShiftConfigHint,
                 style: TextStyle(color: isDark ? Colors.white38 : Colors.grey),
               ),
             );

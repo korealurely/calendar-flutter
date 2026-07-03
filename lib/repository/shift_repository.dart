@@ -37,4 +37,10 @@ class ShiftRepository {
       await isar.calendarShifts.deleteByDateId(dateId);
     });
   }
+
+  Future<void> clearAll() async{
+    await isar.writeTxn(() async{
+      await isar.clear();
+    });
+  }
 }
