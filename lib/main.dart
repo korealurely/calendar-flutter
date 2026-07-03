@@ -7,6 +7,7 @@ import 'package:flutter_calendar/provider/theme_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 // 🎯 必须用 package:flutter_gen 开头的路径，因为这是官方指定的缓存区映射路径
 import 'package:flutter_calendar/l10n/app_localizations.dart';
+import 'package:flutter_calendar/provider/locale_provider.dart';
 
 
 void main() async {
@@ -47,6 +48,8 @@ class MyApp extends ConsumerWidget {
     // 🚀 【核心改动 2】：在这里死死盯住全局的主题模式（白天/黑夜/跟随系统）
     // 采用最新的 @riverpod 注解流生成的 provider 名字全自动转换为小驼峰 appThemeModeProvider
     final themeMode = ref.watch(appThemeModeProvider);
+
+    final currentLocale = ref.watch(appLocaleProvider);
 
     return MaterialApp(
       title: '追梦日历测试',
@@ -106,6 +109,8 @@ class MyApp extends ConsumerWidget {
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         ),
       ),
+
+      locale: currentLocale,
 
       // ==================== 🎯 开启中文汉化核心配置 ====================
       localizationsDelegates: const [

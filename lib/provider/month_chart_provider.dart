@@ -73,9 +73,9 @@ Future<List<WeightStatItem>> monthlyWeightChart(
   DateTime currentMonth,
 ) async {
   // 🚀 核心大招 1：强制保留老参数的内存快照。新月份数据不来，老月份数据死死留在内存里顶住 UI！
-  //final link = ref.keepAlive();
+  final link = ref.keepAlive();
   // 可选：当没有页面 watch 它超过 5 秒后，全自动销毁释放内存，极为高档
-  //ref.onDispose(() => link.close());
+  ref.onDispose(() => link.close());
 
   final weightRepo = ref.watch(weightRepositoryProvider);
   final rawWeights = await weightRepo.getMonthWeights(
@@ -158,9 +158,9 @@ Future<List<WorkTimeStat>> monthlyWorkTimeStats(
   //await Future.delayed(const Duration(milliseconds: 400));
 
   // 🚀 核心大招 1：强制保留老参数的内存快照。新月份数据不来，老月份数据死死留在内存里顶住 UI！
-  //final link = ref.keepAlive();
+  final link = ref.keepAlive();
   // 可选：当没有页面 watch 它超过 5 秒后，全自动销毁释放内存，极为高档
-  //ref.onDispose(() => link.close());
+  ref.onDispose(() => link.close());
 
   // 🚀 【就是这几行，专治隔月装死】
   // 只要排班仓库发生任何增删改，管他在不在当前月，立马让当前月份的工时缓存主动失效！
