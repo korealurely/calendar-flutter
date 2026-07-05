@@ -494,7 +494,7 @@ class ShiftPatternPage extends ConsumerWidget {
                                   items: configList.map((config) {
                                     return DropdownMenuItem<int>(
                                       value: config.id,
-                                      child: Text(config.name, style: TextStyle(color: isDark ? Colors.white70 : Colors.black12, fontSize: 12)),
+                                      child: Text(config.name, style: TextStyle(color: isDark ? Colors.white70 : Colors.black87, fontSize: 12)),
                                     );
                                   }).toList(),
                                   onChanged: (val) {
