@@ -31,9 +31,9 @@
 
 ## 📸 界面预览
 
-| 首页预览 | 首页预览 (夜间) | 排班管理 |
-| :---: | :---: | :---: |
-| <img src="screenshot/首页1.jpeg" width="250"> | <img src="screenshot/首页_2.jpeg" width="250"> | <img src="screenshot/班次管理.jpeg" width="250"> |
+|                     首页预览                      |                  首页预览 (夜间)                   | 排班管理 |
+|:---------------------------------------------:|:--------------------------------------------:| :---: |
+| <img src="screenshot/首页_白.jpeg" width="250"> | <img src="screenshot/首页_白.jpeg" width="250"> | <img src="screenshot/班次管理.jpeg" width="250"> |
 
 | 模式设置 | 排班生成 | 数据统计 |
 | :---: | :---: | :---: |
