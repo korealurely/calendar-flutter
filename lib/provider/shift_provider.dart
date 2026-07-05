@@ -9,6 +9,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:flutter_calendar/data/calendar_shift.dart';
 import 'package:flutter_calendar/repository/shift_repository.dart';
 import 'package:flutter_calendar/provider/month_chart_provider.dart';
+import 'package:flutter_calendar/service/calendar_channel_helper.dart';
 
 
 // 💥 依然雷打不动，让外挂继续生成后门
@@ -196,5 +197,34 @@ class ShiftViewModel extends _$ShiftViewModel {
     ref.invalidate(monthlyShiftChartProvider);
     ref.invalidate(monthlyWeightChartProvider);
     ref.invalidate(monthlyWorkTimeStatsProvider);
+  }
+
+  Future<void> syncAllShiftsToSystem() async{
+    final configListAsync = ref.watch(shiftConfigViewModelProvider);
+    final Map<int, ShiftConfig> configMap = configListAsync.maybeWhen(
+      data: (list) => {for (var config in list) config.id: config},
+      orElse: () => {},
+    );
+
+    final repo = ref.read(shiftRepositoryProvider);
+    final rawShifts = await repo.getAllShifts();
+
+    List<Map<String, dynamic>> batchData = [];
+
+    for(var shift in rawShifts){
+      batchData.add(_generateCalendarData(shift,configMap));
+    }
+    if(batchData.isNotEmpty){
+      await CalendarChannelHelper.syncShiftsToSystem(batchData);
+    }
+  }
+
+  Map<String, dynamic> _generateCalendarData(CalendarShift shift, Map<int, ShiftConfig> configMap) {
+     Map<String, dynamic> mapData= {};
+     mapData["title"] = configMap[shift.shiftConfigId]?.name ;
+     mapData["description"] = "${configMap[shift.shiftConfigId]?.label} ${configMap[shift.shiftConfigId]?.startTime} - ${configMap[shift.shiftConfigId]?.endTime}";
+     mapData["startTime"] = DateTime.parse("${shift.dateId} ${configMap[shift.shiftConfigId]?.startTime}").millisecondsSinceEpoch;
+     mapData["endTime"] = DateTime.parse("${shift.dateId} ${configMap[shift.shiftConfigId]?.endTime}").millisecondsSinceEpoch;
+     return mapData;
   }
 }

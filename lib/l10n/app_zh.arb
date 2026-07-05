@@ -93,6 +93,19 @@
   "workTimeStat": "工时统计",
   "hour": "小时",
   "workStatError": "工时统计加载失败",
-  "workStatHint": "本月还没有登记工时数据哦~"
-
+  "workStatHint": "本月还没有登记工时数据哦~",
+  "language": "语言",
+  "noShiftConfigHint": "暂无班次配置，点击右下角+添加",
+  "deleteConfigConfirmContent": "确定要删除【{configName}】吗？",
+  "@deleteConfigConfirmContent": {
+    "placeholders": {
+      "configName": {
+        "type": "String"
+      }
+    }
+  },
+  "clearHint": "确定清空所有数据吗？",
+  "sync": "同步",
+  "syncHint": "确定同步到系统日历吗?",
+  "syncData": "同步数据"
 }

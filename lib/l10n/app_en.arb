@@ -94,6 +94,20 @@
   "hour": "Hour",
   "workStatError": "Failed to load hours statistics",
   "workStatHint": "No work hours data recorded for this month~",
-  "darkMode": "Dark Mode"
+  "darkMode": "Dark Mode",
+  "clearHint": "Are you sure you want to clear all data?",
+  "deleteConfigConfirmContent": "Are you sure you want to delete [{configName}]?",
+  "@deleteConfigConfirmContent": {
+    "placeholders": {
+      "configName": {
+        "type": "String"
+      }
+    }
+  },
+  "noShiftConfigHint": "No shift configuration yet. Click the + in the bottom right to add.",
+  "language": "Language",
+  "syncHint": "Are you sure you want to sync to the system calendar?",
+  "sync": "Sync",
+  "syncData": "Sync Data"
 
 }

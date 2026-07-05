@@ -107,5 +107,8 @@
   "clearHint": "すべてのデータを本当にクリアしますか？",
   "midShift": "中番",
   "pmShift": "夜勤",
-  "amShift": "早番"
+  "amShift": "早番",
+  "syncHint": "システムカレンダーに同期しますか？",
+  "sync": "同期",
+  "syncData": "データ同期"
 }
