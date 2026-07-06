@@ -31,17 +31,17 @@
 
 ## 📸 界面预览
 
-| 首页预览 | 首页预览 (夜间) | 排班管理 |
-| :---: | :---: | :---: |
-| <img src="screenshot/%E9%A6%96%E9%A1%B51.jpeg" width="250"> | <img src="screenshot/%E9%A6%96%E9%A1%B5_2.jpeg" width="250"> | <img src="screenshot/%E7%8F%AD%E6%AC%A1%E7%AE%A1%E7%90%86.jpeg" width="250"> |
+|                    首页预览                    |                 首页预览 (夜间)                  |                    排班管理                    |
+|:------------------------------------------:|:------------------------------------------:|:------------------------------------------:|
+| <img src="screenshot/p8.jpeg" width="250"> | <img src="screenshot/p9.jpeg" width="250"> | <img src="screenshot/p6.jpeg" width="250"> |
 
-| 模式设置 | 排班生成 | 数据统计 |
-| :---: | :---: | :---: |
-| <img src="screenshot/%E6%A8%A1%E5%BC%8F%E7%AE%A1%E7%90%86.jpeg" width="250"> | <img src="screenshot/%E6%8E%92%E7%8F%AD%E6%A8%A1%E5%BC%8F.jpeg" width="250"> | <img src="screenshot/%E6%95%B0%E6%8D%AE%E6%B1%87%E6%80%BB.jpeg" width="250"> |
+|                    模式设置                    |                    排班生成                    |                    数据统计                    |
+|:------------------------------------------:|:------------------------------------------:|:------------------------------------------:|
+| <img src="screenshot/p3.jpeg" width="250"> | <img src="screenshot/p5.jpeg" width="250"> | <img src="screenshot/p4.jpeg" width="250"> |
 
-| 班次编辑 | 颜色自定义 | 多语言支持 |
-| :---: | :---: | :---: |
-| <img src="screenshot/%E6%8E%92%E7%8F%AD%E4%BF%AE%E6%94%B9.jpeg" width="250"> | <img src="screenshot/%E7%8F%AD%E6%AC%A1%E9%A2%9C%E8%89%B2.jpeg" width="250"> | <img src="screenshot/%E5%A4%9A%E8%AF%AD%E8%A8%80.jpeg" width="250"> |
+|                    班次编辑                    |                   颜色自定义                    |                   多语言支持                    |
+|:------------------------------------------:|:------------------------------------------:|:------------------------------------------:|
+| <img src="screenshot/p2.jpeg" width="250"> | <img src="screenshot/p7.jpeg" width="250"> | <img src="screenshot/p1.jpeg" width="250"> |
 
 ## 🛠️ 技术栈
 
