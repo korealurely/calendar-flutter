@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:flutter_calendar/data/calendar_weight.dart';
 import 'package:flutter_calendar/data/shift_config.dart';
 import 'package:flutter_calendar/data/shift_pattern.dart';
@@ -10,7 +12,7 @@ import 'package:flutter_calendar/data/calendar_shift.dart';
 import 'package:flutter_calendar/repository/shift_repository.dart';
 import 'package:flutter_calendar/provider/month_chart_provider.dart';
 import 'package:flutter_calendar/service/calendar_channel_helper.dart';
-
+import 'package:flutter_calendar/src/generated/calendar_api.g.dart';
 
 // 💥 依然雷打不动，让外挂继续生成后门
 part 'shift_provider.g.dart';
@@ -19,10 +21,12 @@ part 'shift_provider.g.dart';
 @riverpod
 Future<Isar> isarInstance(IsarInstanceRef ref) async {
   final dir = await getApplicationDocumentsDirectory();
-  return await Isar.open(
-    [CalendarShiftSchema,ShiftConfigSchema,ShiftPatternSchema,CalendarWeightSchema],
-    directory: dir.path,
-  );
+  return await Isar.open([
+    CalendarShiftSchema,
+    ShiftConfigSchema,
+    ShiftPatternSchema,
+    CalendarWeightSchema,
+  ], directory: dir.path);
 }
 
 /// 2. 把 Repository 做成单例（保持不变，物理搬砖打工人）
@@ -36,7 +40,6 @@ ShiftRepository shiftRepository(ShiftRepositoryRef ref) {
 /// 每一个 (year, month) 组合都会在内存里生成一个独立的大脑
 @riverpod
 class ShiftViewModel extends _$ShiftViewModel {
-
   @override
   Future<Map<int, CalendarShift>> build(int year, int month) async {
     // 🎯 1. 核心物理切除：把之前那三行 isar.calendarShifts.watchLazy() 和 StreamProvider 彻底干掉！
@@ -118,10 +121,12 @@ class ShiftViewModel extends _$ShiftViewModel {
 
     List<CalendarShift> shiftList = [];
 
-    if (patternType == 0) { // 周固定模式
+    if (patternType == 0) {
+      // 周固定模式
       if (shiftConfigIds.isNotEmpty && shiftConfigIds.length == 7) {
         while (!current.isAfter(end)) {
-          final String formatCurrent = "${current.year}-${current.month.toString().padLeft(2, '0')}-${current.day.toString().padLeft(2, '0')}";
+          final String formatCurrent =
+              "${current.year}-${current.month.toString().padLeft(2, '0')}-${current.day.toString().padLeft(2, '0')}";
           final dayOfWeek = current.weekday - 1;
           final shiftConfigId = shiftConfigIds[dayOfWeek];
           final config = _getCurrentConfigMap()[shiftConfigId];
@@ -129,7 +134,9 @@ class ShiftViewModel extends _$ShiftViewModel {
             ..dateId = current.year * 10000 + current.month * 100 + current.day
             ..shiftConfigId = shiftConfigId
             ..isAlarm = false
-            ..alarmTime = config != null && config.startTime != null ? DateTime.parse("$formatCurrent ${config.startTime!}") : null
+            ..alarmTime = config != null && config.startTime != null
+                ? DateTime.parse("$formatCurrent ${config.startTime!}")
+                : null
             ..updatedAt = DateTime.now();
           shiftList.add(newShift);
           current = current.add(const Duration(days: 1));
@@ -138,7 +145,8 @@ class ShiftViewModel extends _$ShiftViewModel {
     } else {
       final cycleLength = shiftConfigIds.length;
       while (!current.isAfter(end)) {
-        final String formatCurrent = "${current.year}-${current.month.toString().padLeft(2, '0')}-${current.day.toString().padLeft(2, '0')}";
+        final String formatCurrent =
+            "${current.year}-${current.month.toString().padLeft(2, '0')}-${current.day.toString().padLeft(2, '0')}";
         final dayPassed = current.difference(start).inDays;
         final indexInCycle = dayPassed % cycleLength;
         if (shiftConfigIds.isNotEmpty) {
@@ -148,7 +156,9 @@ class ShiftViewModel extends _$ShiftViewModel {
             ..dateId = current.year * 10000 + current.month * 100 + current.day
             ..shiftConfigId = shiftConfigId
             ..isAlarm = false
-            ..alarmTime = config != null && config.startTime != null ? DateTime.parse("$formatCurrent ${config.startTime!}") : null
+            ..alarmTime = config != null && config.startTime != null
+                ? DateTime.parse("$formatCurrent ${config.startTime!}")
+                : null
             ..updatedAt = DateTime.now();
           shiftList.add(newShift);
           current = current.add(const Duration(days: 1));
@@ -186,7 +196,7 @@ class ShiftViewModel extends _$ShiftViewModel {
     );
   }
 
-  Future<void> clearCache() async{
+  Future<void> clearCache() async {
     await ref.read(shiftRepositoryProvider).clearAll();
 
     // 2. 顺手把兄弟们和自己一起枪毙，通知全网刷新空状态
@@ -199,8 +209,9 @@ class ShiftViewModel extends _$ShiftViewModel {
     ref.invalidate(monthlyWorkTimeStatsProvider);
   }
 
-  Future<void> syncAllShiftsToSystem() async{
-    final configListAsync = ref.watch(shiftConfigViewModelProvider);
+  Future<bool> syncAllShiftsToSystem() async {
+    bool isSync = false;
+    final configListAsync = ref.read(shiftConfigViewModelProvider);
     final Map<int, ShiftConfig> configMap = configListAsync.maybeWhen(
       data: (list) => {for (var config in list) config.id: config},
       orElse: () => {},
@@ -209,22 +220,50 @@ class ShiftViewModel extends _$ShiftViewModel {
     final repo = ref.read(shiftRepositoryProvider);
     final rawShifts = await repo.getAllShifts();
 
-    List<Map<String, dynamic>> batchData = [];
+    //List<Map<String, dynamic>> batchData = [];
 
-    for(var shift in rawShifts){
-      batchData.add(_generateCalendarData(shift,configMap));
+    // for(var shift in rawShifts){
+    //   batchData.add(_generateCalendarData(shift,configMap));
+    // }
+    // if(batchData.isNotEmpty){
+    //   isSync = await CalendarChannelHelper.syncShiftsToSystem(batchData);
+    // }
+    List<PigeonShift> pigeonShifts = [];
+    for (var shift in rawShifts) {
+      pigeonShifts.add(_generatePigeonShift(shift, configMap));
     }
-    if(batchData.isNotEmpty){
-      await CalendarChannelHelper.syncShiftsToSystem(batchData);
+    if(pigeonShifts.isNotEmpty){
+      isSync = await CalendarHostApi().syncShiftsToSystem(pigeonShifts);
     }
+    return isSync;
   }
 
-  Map<String, dynamic> _generateCalendarData(CalendarShift shift, Map<int, ShiftConfig> configMap) {
-     Map<String, dynamic> mapData= {};
-     mapData["title"] = configMap[shift.shiftConfigId]?.name ;
-     mapData["description"] = "${configMap[shift.shiftConfigId]?.label} ${configMap[shift.shiftConfigId]?.startTime} - ${configMap[shift.shiftConfigId]?.endTime}";
-     mapData["startTime"] = DateTime.parse("${shift.dateId} ${configMap[shift.shiftConfigId]?.startTime}").millisecondsSinceEpoch;
-     mapData["endTime"] = DateTime.parse("${shift.dateId} ${configMap[shift.shiftConfigId]?.endTime}").millisecondsSinceEpoch;
-     return mapData;
+  Map<String, dynamic> _generateCalendarData(
+    CalendarShift shift,
+    Map<int, ShiftConfig> configMap,
+  ) {
+    Map<String, dynamic> mapData = {};
+    mapData["title"] = configMap[shift.shiftConfigId]?.name;
+    mapData["description"] =
+        "${configMap[shift.shiftConfigId]?.label} ${configMap[shift.shiftConfigId]?.startTime} - ${configMap[shift.shiftConfigId]?.endTime}";
+    mapData["startTime"] = DateTime.parse(
+      "${shift.dateId} ${configMap[shift.shiftConfigId]?.startTime}",
+    ).millisecondsSinceEpoch;
+    mapData["endTime"] = DateTime.parse(
+      "${shift.dateId} ${configMap[shift.shiftConfigId]?.endTime}",
+    ).millisecondsSinceEpoch;
+    return mapData;
+  }
+
+  PigeonShift _generatePigeonShift(
+    CalendarShift shift,
+    Map<int, ShiftConfig> configMap,
+  ) {
+    return PigeonShift(
+      title: configMap[shift.shiftConfigId]?.name ?? "",
+      description: "${configMap[shift.shiftConfigId]?.label} ${configMap[shift.shiftConfigId]?.startTime} - ${configMap[shift.shiftConfigId]?.endTime}",
+      startTimeMills: DateTime.parse("${shift.dateId} ${configMap[shift.shiftConfigId]?.startTime}").millisecondsSinceEpoch,
+      endTimeMills : DateTime.parse("${shift.dateId} ${configMap[shift.shiftConfigId]?.endTime}").millisecondsSinceEpoch
+    );
   }
 }

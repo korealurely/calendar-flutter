@@ -108,6 +108,9 @@
   "language": "Language",
   "syncHint": "Are you sure you want to sync to the system calendar?",
   "sync": "Sync",
-  "syncData": "Sync Data"
+  "syncData": "Sync Data",
+  "syncSuccess": "Data synced successfully!",
+  "syncFail": "Failed to sync data. Please check if the app has permission to access the system calendar.",
+  "syncFailCheck": "Failed to sync data. Please check if the data is complete or if the app has permission to access the system calendar."
 
 }

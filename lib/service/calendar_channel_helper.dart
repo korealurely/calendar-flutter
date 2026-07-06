@@ -1,4 +1,5 @@
 import 'package:flutter/services.dart';
+import 'dart:io';
 
 class CalendarChannelHelper {
   static const MethodChannel _channel = MethodChannel('com.joe.dream_calendar/calendar');
@@ -28,10 +29,14 @@ class CalendarChannelHelper {
   static Future<bool> syncShiftsToSystem(List<Map<String,dynamic>> shifts) async{
     if(shifts.isEmpty) return true;
     try{
-      final bool result = await _channel.invokeMethod("addCalendarEventsBatch",{
-        'shifts':shifts
-      });
-      return result;
+      if(Platform.isAndroid){
+        return await _channel.invokeMethod("addCalendarEventsBatch",{
+          'shifts':shifts
+        });
+      }else if(Platform.isIOS){
+        return await _channel.invokeMethod("syncShiftsToIOS",{'shifts':shifts});
+      }
+      return false;
     }on PlatformException catch (e){
       print("❌ 批量同步日历失败: '${e.message}'");
       return false;

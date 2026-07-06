@@ -13,63 +13,65 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class MainActivity : FlutterActivity(){
+class MainActivity : FlutterActivity(), CalendarHostApi{
     private val CHANNEL = "com.joe.dream_calendar/calendar"
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
 
-        MethodChannel(flutterEngine.dartExecutor.binaryMessenger,CHANNEL).setMethodCallHandler { call, result ->
-            if(call.method == "addCalendarEvent"){
-                val title = call.argument<String>("title")
-                val description = call.argument<String>("description")
-                val startTime = call.argument<Long>("startTime")
-                val endTime = call.argument<Long>("endTime")
-
-                if(title != null && startTime != null && endTime != null){
-                    val success = insertToSystemCalendar(title,description ?:"" ,startTime,endTime)
-                    if(success){
-                        result.success(true)
-                    }else{
-                        result.error("CALENDAR_ERROR","写入系统日历失败",null)
-                    }
-                }else{
-                    result.notImplemented()
-                }
-            }else if(call.method == "addCalendarEventsBatch"){
-                val shifts = call.argument<List<Map<String, Any>>>("shifts")
-
-                if(shifts != null){
-
-                    CoroutineScope(Dispatchers.Main).launch {
-                        val allSuccess = withContext(Dispatchers.IO){
-                            var successFlag = true
-                            val cr = contentResolver
-                            //提前删除
-                            val deleteSelection = "${CalendarContract.Events.ORGANIZER} = ?"
-                            val selectionArgs = arrayOf("dream_calendar@joe.com")
-                            cr.delete(CalendarContract.Events.CONTENT_URI, deleteSelection, selectionArgs)
-
-                            for(shift in shifts){
-                                val title = shift["title"] as? String
-                                val description = shift["description"] as? String
-                                val startTime = shift["startTime"] as? Long
-                                val endTime = shift["endTime"] as? Long
-
-                                if(title != null && startTime != null && endTime != null){
-                                    val success = insertToSystemCalendar(title,description ?: "",startTime,endTime)
-                                    if(!success){ successFlag = false; }
-                                }
-                            }
-                            successFlag
-                        }
-                        result.success(allSuccess)
-                    }
-                }else{
-                    result.error("BAD_ARGUMENTS", "数据列表不能为空", null)
-                }
-            }
-        }
+        //旧的方法
+//        MethodChannel(flutterEngine.dartExecutor.binaryMessenger,CHANNEL).setMethodCallHandler { call, result ->
+//            if(call.method == "addCalendarEvent"){
+//                val title = call.argument<String>("title")
+//                val description = call.argument<String>("description")
+//                val startTime = call.argument<Long>("startTime")
+//                val endTime = call.argument<Long>("endTime")
+//
+//                if(title != null && startTime != null && endTime != null){
+//                    val success = insertToSystemCalendar(title,description ?:"" ,startTime,endTime)
+//                    if(success){
+//                        result.success(true)
+//                    }else{
+//                        result.error("CALENDAR_ERROR","写入系统日历失败",null)
+//                    }
+//                }else{
+//                    result.notImplemented()
+//                }
+//            }else if(call.method == "addCalendarEventsBatch"){
+//                val shifts = call.argument<List<Map<String, Any>>>("shifts")
+//
+//                if(shifts != null){
+//
+//                    CoroutineScope(Dispatchers.Main).launch {
+//                        val allSuccess = withContext(Dispatchers.IO){
+//                            var successFlag = true
+//                            val cr = contentResolver
+//                            //提前删除
+//                            val deleteSelection = "${CalendarContract.Events.ORGANIZER} = ?"
+//                            val selectionArgs = arrayOf("dream_calendar@joe.com")
+//                            cr.delete(CalendarContract.Events.CONTENT_URI, deleteSelection, selectionArgs)
+//
+//                            for(shift in shifts){
+//                                val title = shift["title"] as? String
+//                                val description = shift["description"] as? String
+//                                val startTime = shift["startTime"] as? Long
+//                                val endTime = shift["endTime"] as? Long
+//
+//                                if(title != null && startTime != null && endTime != null){
+//                                    val success = insertToSystemCalendar(title,description ?: "",startTime,endTime)
+//                                    if(!success){ successFlag = false; }
+//                                }
+//                            }
+//                            successFlag
+//                        }
+//                        result.success(allSuccess)
+//                    }
+//                }else{
+//                    result.error("BAD_ARGUMENTS", "数据列表不能为空", null)
+//                }
+//            }
+//        }
+        CalendarHostApi.setUp(flutterEngine.dartExecutor.binaryMessenger,this)
     }
 
     /**
@@ -96,6 +98,39 @@ class MainActivity : FlutterActivity(){
         } catch (e: Exception) {
             e.printStackTrace()
             false
+        }
+    }
+
+    override fun syncShiftsToSystem(
+        shifts: List<PigeonShift>,
+        callback: (Result<Boolean>) -> Unit
+    ) {
+        CoroutineScope(Dispatchers.Main).launch {
+            val allSuccess = withContext(Dispatchers.IO){
+                var successFlag = true
+                val cr = contentResolver
+                try {
+                    val deleteSelection = "${CalendarContract.Events.ORGANIZER} = ?"
+                    val selectionArgs = arrayOf("dream_calendar@joe.com")
+                    cr.delete(CalendarContract.Events.CONTENT_URI, deleteSelection, selectionArgs)
+
+                    for(shift in shifts){
+                        val title = shift.title
+                        val description = shift.description
+                        val startTime = shift.startTimeMills
+                        val endTime = shift.endTimeMills
+                        val success = insertToSystemCalendar(title, description, startTime, endTime)
+                        if (!success) {
+                            successFlag = false
+                        }
+                    }
+                }catch (e: Exception){
+                    e.printStackTrace()
+                    successFlag = false
+                }
+                successFlag
+            }
+            callback(Result.success(allSuccess))
         }
     }
 
