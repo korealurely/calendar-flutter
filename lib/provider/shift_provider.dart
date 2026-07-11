@@ -13,6 +13,8 @@ import 'package:flutter_calendar/repository/shift_repository.dart';
 import 'package:flutter_calendar/provider/month_chart_provider.dart';
 import 'package:flutter_calendar/service/calendar_channel_helper.dart';
 import 'package:flutter_calendar/src/generated/calendar_api.g.dart';
+import 'package:flutter_calendar/src/generated/live_activity_api.g.dart';
+import '';
 
 // 💥 依然雷打不动，让外挂继续生成后门
 part 'shift_provider.g.dart';
@@ -266,4 +268,6 @@ class ShiftViewModel extends _$ShiftViewModel {
       endTimeMills : DateTime.parse("${shift.dateId} ${configMap[shift.shiftConfigId]?.endTime}").millisecondsSinceEpoch
     );
   }
+
+
 }
