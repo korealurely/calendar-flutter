@@ -198,27 +198,21 @@ class _ConsumerStatefulWidget extends ConsumerState<ConsumerStatefulWidget> {
                   // 🍎 1. 如果是 iOS 设备：直接走 Swift 纯原生弹窗与写入通道（绕过插件误判）
                   // =================================================================
                   if (Platform.isIOS) {
+
+                    //灵动岛测试
+                    await ref
+                        .read(
+                          shiftViewModelProvider(
+                            DateTime.now().year,
+                            DateTime.now().month,
+                          ).notifier,
+                        )
+                        .setShiftToIsland();
+
                     print("🚀 当前是 iOS，通过 Pigeon 调起 Swift 原生日历权限与写入...");
                     try {
                       // 1. 组合成强类型的 PigeonShift 对象列表（告别 Map<String, dynamic> ！）
                       final List<PigeonShift> pigeonShifts = [];
-
-                      // 💡 真正用时，遍历你真实的 shifts 排班数据进行转换：
-                      /*
-    for (var shift in rawShifts) {
-      final config = configMap[shift.shiftConfigId];
-      if (config == null) continue;
-
-      pigeonShifts.add(
-        PigeonShift(
-          title: config.name,
-          startTimeMills: _parseToTimestamp(shift.dateId, config.startTime),
-          endTimeMills: _parseToTimestamp(shift.dateId, config.endTime),
-          description: config.description ?? "",
-        ),
-      );
-    }
-    */
 
                       // 2. 像调用普通 Dart 方法一样调用原生，带有完美的方法名和类型提示
                       // 💡 注意：根据我们在 Android 端的结论，Pigeon 在 Dart 端生成的类名就是 CalendarHostApi()

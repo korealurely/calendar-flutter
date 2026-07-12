@@ -18,6 +18,7 @@
 		97C147011CF9000F007C117D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FF1CF9000F007C117D /* LaunchScreen.storyboard */; };
 		9B280FC21E10EDDE50C7F842 /* Pods_RunnerTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 56C429A9347F794BDC9A0F17 /* Pods_RunnerTests.framework */; };
 		D80FF2AF2FFE5216008D5D88 /* CalendarApi.g.swift in Sources */ = {isa = PBXBuildFile; fileRef = D80FF2AE2FFE5216008D5D88 /* CalendarApi.g.swift */; };
+		D8B49CAC30023E4400671AB1 /* LiveActivityApi.g.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8B49CAB30023E4400671AB1 /* LiveActivityApi.g.swift */; };
 		D8E75B9F3000F48D001F73AB /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D8E75B9E3000F48D001F73AB /* WidgetKit.framework */; };
 		D8E75BA13000F48D001F73AB /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D8E75BA03000F48D001F73AB /* SwiftUI.framework */; };
 		D8E75BAE3000F48E001F73AB /* ShiftIslandExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = D8E75B9D3000F48D001F73AB /* ShiftIslandExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
@@ -90,6 +91,7 @@
 		97C147021CF9000F007C117D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A06F75C04EFF3A1D629661B6 /* Pods-RunnerTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RunnerTests.debug.xcconfig"; path = "Target Support Files/Pods-RunnerTests/Pods-RunnerTests.debug.xcconfig"; sourceTree = "<group>"; };
 		D80FF2AE2FFE5216008D5D88 /* CalendarApi.g.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarApi.g.swift; sourceTree = "<group>"; };
+		D8B49CAB30023E4400671AB1 /* LiveActivityApi.g.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveActivityApi.g.swift; sourceTree = "<group>"; };
 		D8E75B9D3000F48D001F73AB /* ShiftIslandExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = ShiftIslandExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		D8E75B9E3000F48D001F73AB /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
 		D8E75BA03000F48D001F73AB /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
@@ -213,6 +215,7 @@
 		97C146F01CF9000F007C117D /* Runner */ = {
 			isa = PBXGroup;
 			children = (
+				D8B49CAB30023E4400671AB1 /* LiveActivityApi.g.swift */,
 				D80FF2AE2FFE5216008D5D88 /* CalendarApi.g.swift */,
 				97C146FA1CF9000F007C117D /* Main.storyboard */,
 				97C146FD1CF9000F007C117D /* Assets.xcassets */,
@@ -505,6 +508,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D8B49CAC30023E4400671AB1 /* LiveActivityApi.g.swift in Sources */,
 				74858FAF1ED2DC5600515810 /* AppDelegate.swift in Sources */,
 				1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */,
 				7884E8682EC3CC0700C636F2 /* SceneDelegate.swift in Sources */,

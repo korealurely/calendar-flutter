@@ -123,6 +123,7 @@ class _ShiftConfigEditBottomSheetState extends ConsumerState<ShiftConfigEditBott
 
             // 🚀 【优化 5】：输入框加入暗黑模式样式修正
             TextField(
+              maxLength: 4,
               controller: _nameController,
               style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color),
               decoration: InputDecoration(

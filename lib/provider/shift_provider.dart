@@ -14,7 +14,7 @@ import 'package:flutter_calendar/provider/month_chart_provider.dart';
 import 'package:flutter_calendar/service/calendar_channel_helper.dart';
 import 'package:flutter_calendar/src/generated/calendar_api.g.dart';
 import 'package:flutter_calendar/src/generated/live_activity_api.g.dart';
-import '';
+
 
 // 💥 依然雷打不动，让外挂继续生成后门
 part 'shift_provider.g.dart';
@@ -269,5 +269,28 @@ class ShiftViewModel extends _$ShiftViewModel {
     );
   }
 
+  Future<void> setShiftToIsland() async{
+    final configListAsync = ref.read(shiftConfigViewModelProvider);
+    final Map<int, ShiftConfig> configMap = configListAsync.maybeWhen(
+      data: (list) => {for (var config in list) config.id: config},
+      orElse: () => {},
+    );
 
+    final repo = ref.read(shiftRepositoryProvider);
+    final dateId = DateTime.now().year * 10000 + DateTime.now().month * 100 + DateTime.now().day;
+    final rawShift = await repo.getShiftById(dateId);
+
+    if(rawShift != null){
+      final config = configMap[rawShift.shiftConfigId];
+      final data = PigeonShiftIslandData(
+        shiftName: config?.name ?? "",
+        startTimeMills: DateTime.parse("${dateId} ${config?.startTime}").millisecondsSinceEpoch,
+        endTimeMills: DateTime.parse("${dateId} ${config?.endTime}").millisecondsSinceEpoch,
+        colorHex: config?.colorValue.toString() ?? "",
+      );
+      await LiveActivityHostApi().startOrUpdateIsland(data);
+    }else{
+      await LiveActivityHostApi().stopIsland();
+    }
+  }
 }
