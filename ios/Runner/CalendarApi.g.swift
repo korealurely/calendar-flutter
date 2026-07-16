@@ -108,6 +108,7 @@ class CalendarHostApiCodec: FlutterStandardMessageCodec {
 /// Generated protocol from Pigeon that represents a handler of messages from Flutter.
 protocol CalendarHostApi {
   func syncShiftsToSystem(shifts: [PigeonShift], completion: @escaping (Result<Bool, Error>) -> Void)
+  func setShiftsAlarmToSystem(shifts: [PigeonShift]) throws
 }
 
 /// Generated setup class from Pigeon to handle messages through the `binaryMessenger`.
@@ -132,6 +133,21 @@ class CalendarHostApiSetup {
       }
     } else {
       syncShiftsToSystemChannel.setMessageHandler(nil)
+    }
+    let setShiftsAlarmToSystemChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.flutter_calendar.CalendarHostApi.setShiftsAlarmToSystem", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      setShiftsAlarmToSystemChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let shiftsArg = args[0] as! [PigeonShift]
+        do {
+          try api.setShiftsAlarmToSystem(shifts: shiftsArg)
+          reply(wrapResult(nil))
+        } catch {
+          reply(wrapError(error))
+        }
+      }
+    } else {
+      setShiftsAlarmToSystemChannel.setMessageHandler(nil)
     }
   }
 }

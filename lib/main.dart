@@ -8,6 +8,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 // 🎯 必须用 package:flutter_gen 开头的路径，因为这是官方指定的缓存区映射路径
 import 'package:flutter_calendar/l10n/app_localizations.dart';
 import 'package:flutter_calendar/provider/locale_provider.dart';
+import 'package:flutter_calendar/provider/alarm_service_provider.dart';
+import 'dart:io';
+import 'package:flutter_calendar/service/notification_helper.dart';
 
 
 void main() async {
@@ -26,6 +29,18 @@ void main() async {
     initialThemeMode = ThemeMode.light;
   }
 
+  // 🎯 2. 平台条件判断：只有是 iOS 平台时，才初始化 iOS 本地通知
+  if (Platform.isIOS) {
+    try {
+      await iOSNotificationHelper.init();
+      debugPrint("🍎 iOS 通知系统静默初始化成功！");
+    } catch (e) {
+      debugPrint("🍎 iOS 通知系统初始化失败: $e");
+    }
+  } else if (Platform.isAndroid) {
+    // 🤖 如果你安卓原生端有什么需要在 Dart 侧启动时初始化的，写在这里
+    debugPrint("🤖 当前运行在 Android 端，跳过 iOS 本地通知初始化");
+  }
   runApp(
     ProviderScope(
       overrides: [
@@ -50,6 +65,8 @@ class MyApp extends ConsumerWidget {
     final themeMode = ref.watch(appThemeModeProvider);
 
     final currentLocale = ref.watch(appLocaleProvider);
+
+    ref.watch(alarmServiceProvider);
 
     return MaterialApp(
       title: '追梦日历测试',

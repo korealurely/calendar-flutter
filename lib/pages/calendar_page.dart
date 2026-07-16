@@ -51,6 +51,7 @@ class _CalendarPageState extends ConsumerState<CalendarPage> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _updateCardHeight(initialPage);
     });
+
   }
 
   @override
@@ -800,4 +801,5 @@ class _CalendarPageState extends ConsumerState<CalendarPage> {
       },
     );
   }
+
 }

@@ -10,6 +10,8 @@ import 'package:permission_handler/permission_handler.dart';
 import 'dart:io';
 import 'package:flutter/services.dart';
 import 'package:flutter_calendar/src/generated/calendar_api.g.dart';
+import 'package:flutter_calendar/provider/alarm_switch_provider.dart';
+import 'package:flutter_calendar/utils/permission.dart';
 
 class MyPage extends ConsumerStatefulWidget {
   const MyPage({super.key});
@@ -165,6 +167,10 @@ class _ConsumerStatefulWidget extends ConsumerState<ConsumerStatefulWidget> {
     // 🚀 【换装天眼】：抓取当前系统的黑夜状态
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
+    final alarmSwitchAsync = ref.watch(alarmSwitchProvider);
+    // 2. 使用 valueOrNull 提取里面的 bool 值，并给定一个默认值（?? false）
+    final isAlarmOpen = alarmSwitchAsync.valueOrNull ?? false;
+
     return ScaffoldMessenger(
       key: _scaffoldMessengerKey,
       child: Scaffold(
@@ -198,7 +204,6 @@ class _ConsumerStatefulWidget extends ConsumerState<ConsumerStatefulWidget> {
                   // 🍎 1. 如果是 iOS 设备：直接走 Swift 纯原生弹窗与写入通道（绕过插件误判）
                   // =================================================================
                   if (Platform.isIOS) {
-
                     //灵动岛测试
                     await ref
                         .read(
@@ -276,6 +281,7 @@ class _ConsumerStatefulWidget extends ConsumerState<ConsumerStatefulWidget> {
                   _confirmClear(context, ref);
                 },
               ),
+              //黑夜模式
               _buildCard(
                 context,
                 AppLocalizations.of(context)!.darkMode,
@@ -311,7 +317,9 @@ class _ConsumerStatefulWidget extends ConsumerState<ConsumerStatefulWidget> {
                   ),
                 ),
               ),
+              //多语言
               _buildLanCard(context),
+              //APP版本
               _buildCard(
                 context,
                 AppLocalizations.of(context)!.currentVersion,
@@ -335,6 +343,62 @@ class _ConsumerStatefulWidget extends ConsumerState<ConsumerStatefulWidget> {
                       size: 20,
                     ),
                   ],
+                ),
+              ),
+              //系统闹钟
+              _buildCard(
+                context,
+                AppLocalizations.of(context)!.systemNotice,
+                trailing: SizedBox(
+                  height: 32,
+                  child: Switch(
+                    value: isAlarmOpen,
+                    activeThumbColor: Colors.white,
+                    activeTrackColor: Colors.blue,
+                    // 🚀 高级感蓝色轨道
+                    inactiveThumbColor: isDark
+                        ? const Color(0xFF999999)
+                        : Colors.white,
+                    inactiveTrackColor: isDark
+                        ? Colors.white12
+                        : const Color(0xFFE5E5E5),
+                    // 🎯 【核心手术】：狙击未打开时的尴尬黑边
+                    trackOutlineColor: WidgetStateProperty.resolveWith<Color?>((
+                      states,
+                    ) {
+                      if (!states.contains(WidgetState.selected)) {
+                        // 当 Switch 未被选中（未打开）时，强行把边框颜色设为透明，彻底干掉大黑边！
+                        return Colors.transparent;
+                      }
+                      return null; // 打开状态下维持原样或交由系统处理
+                    }),
+                    onChanged: (value) {
+                      if(Platform.isAndroid){
+                        if (value == true) {
+                          // 🚀 用户尝试“打开”开关 ── 进行权限拦截
+                          requestNotificationPermission(
+                            context: context,
+                            onGranted: () {
+                              // 同意了，真正去改本地缓存状态为 true
+                              ref.read(alarmSwitchProvider.notifier).toggle(true);
+                            },
+                            onDenied: () {
+                              // 拒绝了，强制把缓存和 UI 重置为 false
+                              ref
+                                  .read(alarmSwitchProvider.notifier)
+                                  .toggle(false);
+                            },
+                          );
+                        } else {
+                          // 🚀 用户主动“关闭”开关 ── 直接修改缓存为 false
+                          ref.read(alarmSwitchProvider.notifier).toggle(false);
+                        }
+                      }else if(Platform.isIOS){
+                        ref.read(alarmSwitchProvider.notifier).toggle(value);
+                      }
+
+                    },
+                  ),
                 ),
               ),
             ],

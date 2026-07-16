@@ -624,6 +624,36 @@ abstract class AppLocalizations {
   /// In zh, this message translates to:
   /// **'同步数据失败，请检查数据是否完整或APP是否具有系统日历读取权限'**
   String get syncFailCheck;
+
+  /// No description provided for @systemNotice.
+  ///
+  /// In zh, this message translates to:
+  /// **'系统通知'**
+  String get systemNotice;
+
+  /// No description provided for @openNotice.
+  ///
+  /// In zh, this message translates to:
+  /// **'开启通知'**
+  String get openNotice;
+
+  /// No description provided for @noticeHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'为了确保排班闹钟能准时响铃，请在设置中开启通知权限。'**
+  String get noticeHint;
+
+  /// No description provided for @later.
+  ///
+  /// In zh, this message translates to:
+  /// **'稍后'**
+  String get later;
+
+  /// No description provided for @goToSetting.
+  ///
+  /// In zh, this message translates to:
+  /// **'去设置'**
+  String get goToSetting;
 }
 
 class _AppLocalizationsDelegate

@@ -4,6 +4,8 @@ import android.content.ContentValues
 import android.net.Uri
 import android.provider.CalendarContract
 import androidx.annotation.NonNull
+import androidx.lifecycle.lifecycleScope
+import com.joe.flutter_calendar.alarm.AlarmScheduler
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
@@ -131,6 +133,13 @@ class MainActivity : FlutterActivity(), CalendarHostApi{
                 successFlag
             }
             callback(Result.success(allSuccess))
+        }
+    }
+
+    //设置shift通知
+    override fun setShiftsAlarmToSystem(shifts: List<PigeonShift>) {
+        lifecycleScope.launch {
+            AlarmScheduler.updateNextScheduler(context,shifts)
         }
     }
 

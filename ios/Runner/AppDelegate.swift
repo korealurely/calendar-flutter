@@ -42,6 +42,14 @@ import ActivityKit
     }
     
     /**
+     * 系统闹钟
+     */
+    func setShiftsAlarmToSystem(shifts: [PigeonShift]) throws {
+        
+    }
+    
+    
+    /**
      * 🛠️ 精准解决当天深夜班次（例如 18:00 - 00:00）的兼容写入方法
      */
     private func insertEventsToIOSCalendar(shifts: [PigeonShift]) async -> Bool {

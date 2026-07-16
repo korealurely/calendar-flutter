@@ -287,4 +287,20 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get syncFailCheck =>
       'Failed to sync data. Please check if the data is complete or if the app has permission to access the system calendar.';
+
+  @override
+  String get systemNotice => 'System Notification';
+
+  @override
+  String get openNotice => 'Enable Notifications';
+
+  @override
+  String get noticeHint =>
+      'To ensure the shift alarm rings on time, please enable notification permissions in the settings.';
+
+  @override
+  String get later => 'Later';
+
+  @override
+  String get goToSetting => 'Go to Settings';
 }

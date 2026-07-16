@@ -48,4 +48,11 @@ class ShiftRepository {
       await isar.clear();
     });
   }
+
+  Future<List<CalendarShift>> getBetweenShifts(int start,int end) async{
+    return await isar.calendarShifts
+        .where()
+        .dateIdBetween(start,end)
+        .findAll();
+  }
 }

@@ -39,7 +39,7 @@ final shiftRepositoryProvider = AutoDisposeProvider<ShiftRepository>.internal(
 );
 
 typedef ShiftRepositoryRef = AutoDisposeProviderRef<ShiftRepository>;
-String _$shiftViewModelHash() => r'c603e2f8aaeec0e9eb0370576f4a05294c569ebf';
+String _$shiftViewModelHash() => r'2457f66f97fa1fd0d83b1b9ec1a2b94587a73281';
 
 /// Copied from Dart SDK
 class _SystemHash {

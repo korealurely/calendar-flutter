@@ -40,6 +40,12 @@ dependencies:
 
   shared_preferences: ^2.3.5  # 或者是当前最新的稳定版本
 
+  # 1. Flutter 本地通知核心插件（处理 iOS 弹窗、定时、自定义声音等）
+  flutter_local_notifications: ^17.0.0
+
+  # 2. 时区库（flutter_local_notifications 触发定时通知 [zonedSchedule] 强制依赖该库）
+  timezone: ^0.9.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

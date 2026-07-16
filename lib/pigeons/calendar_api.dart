@@ -20,4 +20,6 @@ class PigeonShift{
 abstract class CalendarHostApi{
   @async
   bool syncShiftsToSystem(List<PigeonShift> shifts);
+
+  void setShiftsAlarmToSystem(List<PigeonShift> shifts);
 }

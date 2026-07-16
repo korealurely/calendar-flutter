@@ -66,5 +66,10 @@
         <string>追梦日历需要将您的排班班次一键同步至系统日历</string>
         <key>NSSupportsLiveActivities</key>
         <true/>
+
+        <key>UIBackgroundModes</key>
+        <array>
+            <string>remote-notification</string>
+        </array>
     </dict>
 </plist>

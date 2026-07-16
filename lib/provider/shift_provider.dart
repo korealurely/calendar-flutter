@@ -14,6 +14,7 @@ import 'package:flutter_calendar/provider/month_chart_provider.dart';
 import 'package:flutter_calendar/service/calendar_channel_helper.dart';
 import 'package:flutter_calendar/src/generated/calendar_api.g.dart';
 import 'package:flutter_calendar/src/generated/live_activity_api.g.dart';
+import 'package:flutter_calendar/provider/alarm_service_provider.dart';
 
 
 // 💥 依然雷打不动，让外挂继续生成后门
@@ -108,6 +109,7 @@ class ShiftViewModel extends _$ShiftViewModel {
     ref.invalidate(monthlyShiftChartProvider); // 叫隔壁（图表）顺便重捞
     //ref.invalidate(monthlyWeightChartProvider);
     ref.invalidate(monthlyWorkTimeStatsProvider);
+    ref.invalidate(alarmServiceProvider);
   }
 
   /// 💾 批量生成排班
@@ -176,6 +178,7 @@ class ShiftViewModel extends _$ShiftViewModel {
     ref.invalidate(monthlyShiftChartProvider);
     //ref.invalidate(monthlyWeightChartProvider);
     ref.invalidate(monthlyWorkTimeStatsProvider);
+    ref.invalidate(alarmServiceProvider);
   }
 
   /// 💾 删除排班
@@ -188,6 +191,7 @@ class ShiftViewModel extends _$ShiftViewModel {
     ref.invalidate(monthlyShiftChartProvider);
     //ref.invalidate(monthlyWeightChartProvider);
     ref.invalidate(monthlyWorkTimeStatsProvider);
+    ref.invalidate(alarmServiceProvider);
   }
 
   Map<int, ShiftConfig> _getCurrentConfigMap() {
@@ -209,6 +213,7 @@ class ShiftViewModel extends _$ShiftViewModel {
     ref.invalidate(monthlyShiftChartProvider);
     ref.invalidate(monthlyWeightChartProvider);
     ref.invalidate(monthlyWorkTimeStatsProvider);
+    ref.invalidate(alarmServiceProvider);
   }
 
   Future<bool> syncAllShiftsToSystem() async {
@@ -240,22 +245,22 @@ class ShiftViewModel extends _$ShiftViewModel {
     return isSync;
   }
 
-  Map<String, dynamic> _generateCalendarData(
-    CalendarShift shift,
-    Map<int, ShiftConfig> configMap,
-  ) {
-    Map<String, dynamic> mapData = {};
-    mapData["title"] = configMap[shift.shiftConfigId]?.name;
-    mapData["description"] =
-        "${configMap[shift.shiftConfigId]?.label} ${configMap[shift.shiftConfigId]?.startTime} - ${configMap[shift.shiftConfigId]?.endTime}";
-    mapData["startTime"] = DateTime.parse(
-      "${shift.dateId} ${configMap[shift.shiftConfigId]?.startTime}",
-    ).millisecondsSinceEpoch;
-    mapData["endTime"] = DateTime.parse(
-      "${shift.dateId} ${configMap[shift.shiftConfigId]?.endTime}",
-    ).millisecondsSinceEpoch;
-    return mapData;
-  }
+  // Map<String, dynamic> _generateCalendarData(
+  //   CalendarShift shift,
+  //   Map<int, ShiftConfig> configMap,
+  // ) {
+  //   Map<String, dynamic> mapData = {};
+  //   mapData["title"] = configMap[shift.shiftConfigId]?.name;
+  //   mapData["description"] =
+  //       "${configMap[shift.shiftConfigId]?.label} ${configMap[shift.shiftConfigId]?.startTime} - ${configMap[shift.shiftConfigId]?.endTime}";
+  //   mapData["startTime"] = DateTime.parse(
+  //     "${shift.dateId} ${configMap[shift.shiftConfigId]?.startTime}",
+  //   ).millisecondsSinceEpoch;
+  //   mapData["endTime"] = DateTime.parse(
+  //     "${shift.dateId} ${configMap[shift.shiftConfigId]?.endTime}",
+  //   ).millisecondsSinceEpoch;
+  //   return mapData;
+  // }
 
   PigeonShift _generatePigeonShift(
     CalendarShift shift,
@@ -293,4 +298,39 @@ class ShiftViewModel extends _$ShiftViewModel {
       await LiveActivityHostApi().stopIsland();
     }
   }
+
+  // Future<void> setShiftsToSystemAlarm() async {
+  //   final configListAsync = ref.read(shiftConfigViewModelProvider);
+  //   final Map<int, ShiftConfig> configMap = configListAsync.maybeWhen(
+  //     data: (list) => {for (var config in list) config.id: config},
+  //     orElse: () => {},
+  //   );
+  //
+  //   final repo = ref.read(shiftRepositoryProvider);
+  //
+  //   final deteNow = DateTime.now();
+  //   final start = deteNow.year * 10000 + deteNow.month * 100 + deteNow.day;
+  //   final end = start + 6;
+  //
+  //   final rawShifts = await repo.getBetweenShifts(start, end);
+  //
+  //   List<PigeonShift> pigeonShifts = [];
+  //   for (var shift in rawShifts) {
+  //     pigeonShifts.add(_generateAlarmPigeonShift(shift, configMap));
+  //   }
+  //
+  //   await CalendarHostApi().setShiftsAlarmToSystem(pigeonShifts);
+  // }
+
+  // PigeonShift _generateAlarmPigeonShift(
+  //     CalendarShift shift,
+  //     Map<int, ShiftConfig> configMap,
+  //     ) {
+  //   return PigeonShift(
+  //       title: "${configMap[shift.shiftConfigId]?.name}提醒",
+  //       description: "您有一个${configMap[shift.shiftConfigId]?.label}将于 ${configMap[shift.shiftConfigId]?.startTime} 开始",
+  //       startTimeMills: DateTime.parse("${shift.dateId} ${configMap[shift.shiftConfigId]?.startTime}").millisecondsSinceEpoch,
+  //       endTimeMills : DateTime.parse("${shift.dateId} ${configMap[shift.shiftConfigId]?.endTime}").millisecondsSinceEpoch
+  //   );
+  // }
 }

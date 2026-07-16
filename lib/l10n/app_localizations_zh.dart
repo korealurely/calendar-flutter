@@ -280,6 +280,21 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get syncFailCheck => '同步数据失败，请检查数据是否完整或APP是否具有系统日历读取权限';
+
+  @override
+  String get systemNotice => '系统通知';
+
+  @override
+  String get openNotice => '开启通知';
+
+  @override
+  String get noticeHint => '为了确保排班闹钟能准时响铃，请在设置中开启通知权限。';
+
+  @override
+  String get later => '稍后';
+
+  @override
+  String get goToSetting => '去设置';
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -558,4 +573,19 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get syncFailCheck => '同步資料失敗，請檢查資料是否完整或APP是否具有系統行事曆讀取權限';
+
+  @override
+  String get systemNotice => '系統通知';
+
+  @override
+  String get openNotice => '開啟通知';
+
+  @override
+  String get noticeHint => '為了確保排班鬧鐘能準時響鈴，請在設定中開啟通知權限。';
+
+  @override
+  String get later => '稍後';
+
+  @override
+  String get goToSetting => '前往設定';
 }

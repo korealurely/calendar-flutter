@@ -161,7 +161,7 @@ class _MonthlyShiftChartProviderElement
 }
 
 String _$monthlyWeightChartHash() =>
-    r'cc90dd1bf323e3af02d1ac488e1f8c9dcef91c4d';
+    r'bc244a9fca4010b33f4feeb55feb23a3992b143b';
 
 /// See also [monthlyWeightChart].
 @ProviderFor(monthlyWeightChart)
@@ -297,7 +297,7 @@ class _MonthlyWeightChartProviderElement
 }
 
 String _$monthlyWorkTimeStatsHash() =>
-    r'366d9928570a58595bf9f278c8375aa29bdb8ac4';
+    r'f10a53f1899ff9ffac6dce6531ed19f2921fc49d';
 
 /// See also [monthlyWorkTimeStats].
 @ProviderFor(monthlyWorkTimeStats)

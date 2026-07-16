@@ -97,6 +97,7 @@ private object CalendarHostApiCodec : StandardMessageCodec() {
 /** Generated interface from Pigeon that represents a handler of messages from Flutter. */
 interface CalendarHostApi {
   fun syncShiftsToSystem(shifts: List<PigeonShift>, callback: (Result<Boolean>) -> Unit)
+  fun setShiftsAlarmToSystem(shifts: List<PigeonShift>)
 
   companion object {
     /** The codec used by CalendarHostApi. */
@@ -121,6 +122,25 @@ interface CalendarHostApi {
                 reply.reply(wrapResult(data))
               }
             }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.flutter_calendar.CalendarHostApi.setShiftsAlarmToSystem", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val shiftsArg = args[0] as List<PigeonShift>
+            var wrapped: List<Any?>
+            try {
+              api.setShiftsAlarmToSystem(shiftsArg)
+              wrapped = listOf<Any?>(null)
+            } catch (exception: Throwable) {
+              wrapped = wrapError(exception)
+            }
+            reply.reply(wrapped)
           }
         } else {
           channel.setMessageHandler(null)

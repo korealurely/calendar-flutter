@@ -281,4 +281,19 @@ class AppLocalizationsJa extends AppLocalizations {
   @override
   String get syncFailCheck =>
       'データ同期に失敗しました。データが完全か、またはアプリにシステムカレンダーの読み取り権限があるかご確認ください。';
+
+  @override
+  String get systemNotice => 'システム通知';
+
+  @override
+  String get openNotice => '通知をオンにする';
+
+  @override
+  String get noticeHint => 'シフトアラームが時間通りに鳴るように、設定で通知権限をオンにしてください。';
+
+  @override
+  String get later => '後で';
+
+  @override
+  String get goToSetting => '設定へ行く';
 }

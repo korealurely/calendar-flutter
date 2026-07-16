@@ -3,6 +3,7 @@ import 'package:isar/isar.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:flutter_calendar/data/shift_config.dart';
 import 'package:flutter_calendar/repository/shift_config_repository.dart';
+import 'package:flutter_calendar/provider/alarm_service_provider.dart';
 
 part 'shift_config_provider.g.dart';
 
@@ -41,6 +42,7 @@ class ShiftConfigViewModel extends _$ShiftConfigViewModel {
     // 1. 无论如何，先把数据库里的肉身斩断
     final repo = ref.read(shiftConfigRepositoryProvider);
     await repo.deleteConfigById(configId);
+    ref.invalidate(alarmServiceProvider);
 
     // 2. 🛡️ 边界防御：启动双保险状态机
     if (state.hasValue && !state.isLoading) {
@@ -82,6 +84,7 @@ class ShiftConfigViewModel extends _$ShiftConfigViewModel {
 
     final repo = ref.read(shiftConfigRepositoryProvider);
     await repo.saveConfig(newConfig);
+    ref.invalidate(alarmServiceProvider);
 
     // 保存完后，把新列表全量拉回来并无闪断塞给 state
     final newList = await repo.getConfigs();

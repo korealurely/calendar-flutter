@@ -281,4 +281,19 @@ class AppLocalizationsKo extends AppLocalizations {
   @override
   String get syncFailCheck =>
       '데이터 동기화에 실패했습니다. 데이터가 완전한지 또는 앱에 시스템 캘린더 읽기 권한이 있는지 확인해 주세요.';
+
+  @override
+  String get systemNotice => '시스템 알림';
+
+  @override
+  String get openNotice => '알림 켜기';
+
+  @override
+  String get noticeHint => '근무 알람이 제때 울릴 수 있도록 설정에서 알림 권한을 켜주세요.';
+
+  @override
+  String get later => '나중에';
+
+  @override
+  String get goToSetting => '설정으로 이동';
 }

@@ -109,5 +109,10 @@
   "syncHint": "确定同步到系统日历吗?",
   "syncData": "同步数据",
   "syncSuccess": "同步数据成功!",
-  "syncFailCheck": "同步数据失败，请检查数据是否完整或APP是否具有系统日历读取权限"
+  "syncFailCheck": "同步数据失败，请检查数据是否完整或APP是否具有系统日历读取权限",
+  "systemNotice": "系统通知",
+  "openNotice": "开启通知",
+  "noticeHint": "为了确保排班闹钟能准时响铃，请在设置中开启通知权限。",
+  "later": "稍后",
+  "goToSetting": "去设置"
 }
